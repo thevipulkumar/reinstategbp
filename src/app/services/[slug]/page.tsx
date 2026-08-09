@@ -9,6 +9,7 @@ import { FaqSection } from "@/components/FaqSection";
 import { ContactSection } from "@/components/contact/ContactSection";
 import { VideoTestimonials } from "@/components/home/VideoTestimonials";
 import { getService, services } from "@/data/services";
+import { sharedHeadings } from "@/data/pages";
 import { breadcrumbSchema, serviceSchema } from "@/lib/structured-data";
 
 export function generateStaticParams() {
@@ -136,11 +137,11 @@ export default async function ServicePage({ params }: { params: Promise<{ slug: 
         </Reveal>
       </Section>
 
-      <VideoTestimonials heading="Hear from the Business Owners" withSchema={false} />
+      <VideoTestimonials heading={sharedHeadings.testimonials} withSchema={false} />
 
-      <FaqSection heading={`${service.navLabel} — questions we get asked`} items={service.faqs} />
+      <FaqSection heading={sharedHeadings.serviceFaq(service.navLabel)} items={service.faqs} />
 
-      <ContactSection heading="Speak to our Experts" />
+      <ContactSection heading={sharedHeadings.contact} />
 
       <JsonLd data={[serviceSchema(service), breadcrumbSchema(crumbs)]} />
     </>

@@ -6,6 +6,7 @@ import { Reveal } from "@/components/ui/Reveal";
 import { JsonLd } from "@/components/ui/JsonLd";
 import { PostCard } from "@/components/blog/PostCard";
 import { getPostsForPage, getTotalPages } from "@/lib/blog";
+import { blogPage } from "@/data/pages";
 import { breadcrumbSchema } from "@/lib/structured-data";
 import { cn } from "@/lib/utils";
 
@@ -26,19 +27,15 @@ export function BlogIndex({ page }: { page: number }) {
   return (
     <>
       <PageHero
-        eyebrow="Blog"
-        headline={{
-          lead: "Straight answers on",
-          accent: "Google Business Profile",
-          tail: "problems.",
-        }}
-        subheadline="Suspensions, verifications and denied appeals, explained by the people who work on them daily. No filler, no recycled Google help-centre text."
+        eyebrow={blogPage.eyebrow}
+        headline={blogPage.headline}
+        subheadline={blogPage.subheadline}
         crumbs={crumbs}
       />
 
       <Section tone="surface">
         {posts.length === 0 ? (
-          <p className="text-body">No posts yet — check back shortly.</p>
+          <p className="text-body">{blogPage.emptyState}</p>
         ) : (
           <ul className="grid gap-7 md:grid-cols-2 lg:grid-cols-3">
             {posts.map((post, index) => (

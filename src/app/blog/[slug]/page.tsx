@@ -9,6 +9,7 @@ import { JsonLd } from "@/components/ui/JsonLd";
 import { PostCard } from "@/components/blog/PostCard";
 import { ContactSection } from "@/components/contact/ContactSection";
 import { getAllPosts, getPost, getRelatedPosts } from "@/lib/blog";
+import { blogPage } from "@/data/pages";
 import { articleSchema, breadcrumbSchema } from "@/lib/structured-data";
 import { formatDate } from "@/lib/utils";
 
@@ -68,7 +69,7 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
   return (
     <>
       <PageHero
-        eyebrow={post.tags[0] ?? "Article"}
+        eyebrow={post.tags[0] ?? blogPage.fallbackEyebrow}
         headline={{ lead: post.title, accent: "", tail: "" }}
         crumbs={crumbs}
       >
@@ -117,14 +118,14 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
             className="btn-label mt-10 inline-flex items-center gap-2 text-brand-dark"
           >
             <ArrowLeft aria-hidden="true" className="size-4" />
-            All articles
+            {blogPage.allArticlesLabel}
           </Link>
         </div>
       </Section>
 
       {related.length ? (
         <Section tone="surface">
-          <h2 className="text-h2">Related reading</h2>
+          <h2 className="text-h2">{blogPage.relatedHeading}</h2>
           <ul className="mt-10 grid gap-7 md:grid-cols-2 lg:grid-cols-3">
             {related.map((relatedPost) => (
               <li key={relatedPost.slug}>
@@ -135,7 +136,7 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
         </Section>
       ) : null}
 
-      <ContactSection heading="Suspended right now? Talk to a specialist." />
+      <ContactSection heading={blogPage.postContactHeading} />
 
       <JsonLd data={[articleSchema(post), breadcrumbSchema(crumbs)]} />
     </>

@@ -41,7 +41,12 @@
       "Bash(node -e 'console.log\\(Date.now\\(\\)\\)')",
       "Bash(curl -s -X POST http://localhost:3100/api/contact -H 'Content-Type: application/json' -d \"{\\\\\"firstName\\\\\":\\\\\"Fast\\\\\",\\\\\"lastName\\\\\":\\\\\"Bot\\\\\",\\\\\"email\\\\\":\\\\\"f@example.com\\\\\",\\\\\"phone\\\\\":\\\\\"+15551234567\\\\\",\\\\\"message\\\\\":\\\\\"this was filled in instantly\\\\\",\\\\\"renderedAt\\\\\":$\\(node -e 'console.log\\(Date.now\\(\\)\\)'\\)}\")",
       "Bash(curl -s -X POST http://localhost:3100/api/contact -H 'Content-Type: application/json' -d '{\"firstName\":\"Dana\",\"lastName\":\"Reyes\",\"email\":\"dana@example.com\",\"phone\":\"+1 555 123 4567\",\"message\":\"My listing was suspended on Tuesday after I changed my address.\"}')",
-      "Bash(curl -s http://localhost:3100/services/appeal-denied)"
+      "Bash(curl -s http://localhost:3100/services/appeal-denied)",
+      "Bash(perl -pi -e 's{import \\\\{ homepageFaqs \\\\} from \"\\\\@/data/faqs\";}{import { homepageFaqs } from \"\\\\@/data/faqs\";\\\\nimport { contactPage, sharedHeadings } from \"\\\\@/data/pages\";}' src/app/contact/page.tsx)",
+      "Bash(perl -pi -e 's{import \\\\{ getService, services \\\\} from \"\\\\@/data/services\";}{import { getService, services } from \"\\\\@/data/services\";\\\\nimport { sharedHeadings } from \"\\\\@/data/pages\";}; s{<VideoTestimonials heading=\"Hear from the Business Owners\" withSchema=\\\\{false\\\\} />}{<VideoTestimonials heading={sharedHeadings.testimonials} withSchema={false} />}; s{heading=\\\\{`\\\\$\\\\{service\\\\.navLabel\\\\} — questions we get asked`\\\\}}{heading={sharedHeadings.serviceFaq\\(service.navLabel\\)}}; s{<ContactSection heading=\"Speak to our Experts\" />}{<ContactSection heading={sharedHeadings.contact} />}' src/app/services/\\\\[slug\\\\]/page.tsx)",
+      "Bash(perl -pi -e 's{import \\\\{ about \\\\} from \"\\\\@/data/about\";}{import { about } from \"\\\\@/data/about\";\\\\nimport { sharedHeadings } from \"\\\\@/data/pages\";}; s{<ContactSection heading=\"Speak to our Experts\" />}{<ContactSection heading={sharedHeadings.contact} />}' src/app/about/page.tsx)",
+      "Bash(perl -0777 -pi -e ' *)",
+      "Bash(perl -pi -e 's{import \\\\{ blogPage, sharedHeadings \\\\} from \"\\\\@/data/pages\";}{import { blogPage } from \"\\\\@/data/pages\";}' \"src/app/blog/[slug]/page.tsx\")"
     ]
   }
 }

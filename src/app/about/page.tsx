@@ -6,6 +6,7 @@ import { JsonLd } from "@/components/ui/JsonLd";
 import { TeamSection } from "@/components/home/TeamSection";
 import { ContactSection } from "@/components/contact/ContactSection";
 import { about } from "@/data/about";
+import { sharedHeadings } from "@/data/pages";
 import { site } from "@/data/site";
 import { breadcrumbSchema } from "@/lib/structured-data";
 
@@ -86,7 +87,7 @@ export default function AboutPage() {
 
       <TeamSection />
 
-      <ContactSection heading="Speak to our Experts" />
+      <ContactSection heading={sharedHeadings.contact} />
 
       <JsonLd data={breadcrumbSchema(crumbs)} />
     </>

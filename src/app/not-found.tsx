@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { PageHero } from "@/components/PageHero";
 import { Section } from "@/components/ui/Section";
 import { ButtonLink } from "@/components/ui/Button";
+import { notFoundPage } from "@/data/pages";
 import { services } from "@/data/services";
 
 export const metadata: Metadata = {
@@ -13,9 +14,9 @@ export default function NotFound() {
   return (
     <>
       <PageHero
-        eyebrow="404"
-        headline={{ lead: "We couldn't find", accent: "that page", tail: "" }}
-        subheadline="The link may be out of date, or the page may have moved. Here's where most people are heading."
+        eyebrow={notFoundPage.eyebrow}
+        headline={notFoundPage.headline}
+        subheadline={notFoundPage.subheadline}
       />
 
       <Section tone="white">
@@ -35,7 +36,7 @@ export default function NotFound() {
         </ul>
 
         <div className="mt-10">
-          <ButtonLink href="/">Back to the homepage</ButtonLink>
+          <ButtonLink href="/">{notFoundPage.homeLabel}</ButtonLink>
         </div>
       </Section>
     </>

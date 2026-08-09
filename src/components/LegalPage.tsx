@@ -3,6 +3,7 @@ import { Section } from "@/components/ui/Section";
 import { JsonLd } from "@/components/ui/JsonLd";
 import type { LegalDocument } from "@/data/legal";
 import { breadcrumbSchema } from "@/lib/structured-data";
+import { legalPage } from "@/data/pages";
 import { formatDate } from "@/lib/utils";
 
 export function LegalPage({ doc, href }: { doc: LegalDocument; href: string }) {
@@ -14,7 +15,7 @@ export function LegalPage({ doc, href }: { doc: LegalDocument; href: string }) {
   return (
     <>
       <PageHero
-        eyebrow="Legal"
+        eyebrow={legalPage.eyebrow}
         headline={{ lead: doc.title, accent: "", tail: "" }}
         subheadline={doc.description}
         crumbs={crumbs}
@@ -23,7 +24,7 @@ export function LegalPage({ doc, href }: { doc: LegalDocument; href: string }) {
       <Section tone="white">
         <div className="mx-auto max-w-[760px]">
           <p className="text-[14px] font-semibold uppercase tracking-wide text-muted">
-            Last updated {formatDate(doc.updated)}
+            {legalPage.updatedPrefix} {formatDate(doc.updated)}
           </p>
 
           <div className="prose-body mt-8">
