@@ -17,7 +17,13 @@
       "Bash(npx tsc *)",
       "Bash(npm run *)",
       "Bash(git add *)",
-      "Bash(git commit -q -m ' *)"
+      "Bash(git commit -q -m ' *)",
+      "Bash(perl -pi -e 's/className=\"md:col-span-5\"/className=\"md:col-span-4\"/; s/aria-label=\"Contact\"//; s/<div className=\"md:col-span-2\">/<div className=\"md:col-span-3\">/; s/flex items-start gap-2\\\\.5 break-all text-\\\\[15px\\\\]/flex items-start gap-2.5 break-words text-[15px]/' src/components/layout/Footer.tsx)",
+      "Bash(perl -pi -e 's/\\\\{videoSection\\\\.heading\\\\}/{heading}/; s/^      <JsonLd data=\\\\{schema\\\\} \\\\/>$/      {withSchema ? <JsonLd data={schema} \\\\/> : null}/' src/components/home/VideoTestimonials.tsx)",
+      "Bash(perl -pi -e 's/      <VideoTestimonials \\\\/>\\\\n//' src/app/services/\\\\[slug\\\\]/page.tsx)",
+      "Bash(perl -pi -e 's/import \\\\{ getAllPosts, getTotalPages \\\\} from \"\\\\@\\\\/lib\\\\/blog\";/import { getAllPosts } from \"\\\\@\\\\/lib\\\\/blog\";/' src/app/sitemap.ts)",
+      "Bash(npx next *)",
+      "Bash(npx eslint *)"
     ]
   }
 }

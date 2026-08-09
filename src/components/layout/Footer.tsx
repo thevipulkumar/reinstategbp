@@ -13,7 +13,7 @@ export function Footer() {
     <footer className="bg-navy text-white">
       <Container className="py-14 md:py-20">
         <div className="grid gap-12 md:grid-cols-12">
-          <div className="md:col-span-5">
+          <div className="md:col-span-4">
             <Logo href="/" className="text-white" />
             <p className="mt-5 max-w-sm text-[15px] leading-relaxed text-white/70">
               {site.description}
@@ -52,7 +52,7 @@ export function Footer() {
             </ul>
           </nav>
 
-          <div className="md:col-span-2">
+          <div className="md:col-span-3">
             <h2 className="eyebrow text-brand-light!">Contact</h2>
             <ul className="mt-5 space-y-3">
               <li>
@@ -67,7 +67,7 @@ export function Footer() {
               <li>
                 <a
                   href={`mailto:${site.email}`}
-                  className="flex items-start gap-2.5 break-all text-[15px] text-white/80 transition-colors hover:text-white"
+                  className="flex items-start gap-2.5 break-words text-[15px] text-white/80 transition-colors hover:text-white"
                 >
                   <Mail aria-hidden="true" className="mt-0.5 size-4 shrink-0 text-brand-light" />
                   {site.email}

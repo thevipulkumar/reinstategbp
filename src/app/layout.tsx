@@ -65,7 +65,10 @@ const gtmId = process.env.NEXT_PUBLIC_GTM_ID;
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en" className={spaceGrotesk.variable}>
+    // suppressHydrationWarning: the inline script below adds a `js` class to
+    // <html> before React hydrates, which is a deliberate server/client
+    // difference on this element only.
+    <html lang="en" className={spaceGrotesk.variable} suppressHydrationWarning>
       <head>
         {/*
           Marks the document as JS-capable before first paint, which is what gates

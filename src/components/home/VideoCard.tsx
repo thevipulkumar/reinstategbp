@@ -16,12 +16,15 @@ import { cn } from "@/lib/utils";
  * load, which is most of what its performance score cost.
  */
 export function VideoCard({ testimonial }: { testimonial: Testimonial }) {
-  const [playing, setPlaying] = useState(false);
-  const [thumbnail, setThumbnail] = useState(
-    `https://img.youtube.com/vi/${testimonial.id}/maxresdefault.jpg`,
-  );
-
   const isShort = testimonial.orientation === "short";
+
+  const [playing, setPlaying] = useState(false);
+  // Shorts have no maxresdefault; `oardefault` is the variant that keeps their
+  // 9:16 framing. Landscape videos use maxresdefault. `hqdefault` exists for
+  // every video and backs both up if a variant is ever missing.
+  const [thumbnail, setThumbnail] = useState(
+    `https://img.youtube.com/vi/${testimonial.id}/${isShort ? "oardefault" : "maxresdefault"}.jpg`,
+  );
   const showAttribution = hasRealAttribution(testimonial);
   const label = showAttribution
     ? `Play testimonial from ${testimonial.clientName}`

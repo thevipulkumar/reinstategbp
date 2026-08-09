@@ -210,7 +210,10 @@ export function ContactForm() {
       </div>
 
       {/* Honeypot — hidden from users and assistive tech, irresistible to bots. */}
-      <div aria-hidden="true" className="absolute -left-[9999px] size-px overflow-hidden">
+      <div
+        aria-hidden="true"
+        className="pointer-events-none absolute left-0 top-0 size-px overflow-hidden opacity-0"
+      >
         <label htmlFor="website">Leave this field empty</label>
         <input id="website" type="text" tabIndex={-1} autoComplete="off" {...register("website")} />
       </div>

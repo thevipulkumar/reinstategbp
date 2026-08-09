@@ -7,7 +7,14 @@ import { hasRealAttribution, landscapeTestimonials, shortTestimonials, testimoni
 import { videoSchema } from "@/lib/structured-data";
 
 /** §6.6 — shorts in a row of three, landscape videos in a 2×2 grid. */
-export function VideoTestimonials() {
+export function VideoTestimonials({
+  heading = videoSection.heading,
+  /** Only the homepage claims the VideoObject markup, to avoid duplicating it. */
+  withSchema = true,
+}: {
+  heading?: string;
+  withSchema?: boolean;
+} = {}) {
   const schema = testimonials.map((testimonial) =>
     videoSchema({
       id: testimonial.id,
@@ -23,7 +30,7 @@ export function VideoTestimonials() {
   return (
     <Section tone="surface">
       <Reveal>
-        <h2 className="text-h2 text-center">{videoSection.heading}</h2>
+        <h2 className="text-h2 text-center">{heading}</h2>
       </Reveal>
 
       <div className="mx-auto mt-12 grid max-w-[860px] gap-6 sm:grid-cols-3">
@@ -42,7 +49,7 @@ export function VideoTestimonials() {
         ))}
       </div>
 
-      <JsonLd data={schema} />
+      {withSchema ? <JsonLd data={schema} /> : null}
     </Section>
   );
 }

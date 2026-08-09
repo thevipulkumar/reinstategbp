@@ -17,12 +17,11 @@ export function Hero() {
       <Image
         src={hero.image.src}
         alt={hero.image.alt}
-        width={hero.image.width}
-        height={hero.image.height}
+        fill
         priority
         fetchPriority="high"
         sizes="100vw"
-        className="absolute inset-0 -z-10 size-full object-cover object-[70%_center]"
+        className="-z-10 object-cover object-[70%_center]"
       />
 
       <div
