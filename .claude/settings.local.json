@@ -53,7 +53,26 @@
       "Bash(perl -pi -e 's{^import \\\\{ Logo \\\\} from \"\\\\@/components/Logo\";\\\\n$}{}' src/components/home/Hero.tsx)",
       "Bash(awk '{print $9, $5}')",
       "Bash(curl -s -o /tmp/raw.webp \"http://localhost:3000/images/google-listing-suspended.webp\")",
-      "Bash(node -e \"require\\('sharp'\\)\\('/tmp/raw.webp'\\).metadata\\(\\).then\\(m=>console.log\\('SERVED static:', m.width+'x'+m.height\\)\\)\")"
+      "Bash(node -e \"require\\('sharp'\\)\\('/tmp/raw.webp'\\).metadata\\(\\).then\\(m=>console.log\\('SERVED static:', m.width+'x'+m.height\\)\\)\")",
+      "Bash(ssh -o StrictHostKeyChecking=accept-new -o ConnectTimeout=10 -T git@github.com)",
+      "Bash(curl -s https://api.github.com/repos/thevipulkumar/reinstategbp)",
+      "Bash(node -e \"let d='';process.stdin.on\\('data',c=>d+=c\\).on\\('end',\\(\\)=>{const r=JSON.parse\\(d\\);console.log\\('  private:',r.private,'| default_branch:',r.default_branch,'| size:',r.size,'KB'\\);}\\);\")",
+      "Bash(git ls-remote *)",
+      "Bash(git remote *)",
+      "Bash(git push *)",
+      "Bash(curl -s \"https://api.github.com/repos/thevipulkumar/reinstategbp/commits?per_page=20\")",
+      "Bash(node -e \"let d='';process.stdin.on\\('data',c=>d+=c\\).on\\('end',\\(\\)=>{const r=JSON.parse\\(d\\);console.log\\('  '+r.length+' commits'\\);r.forEach\\(c=>console.log\\('   ',c.sha.slice\\(0,7\\),c.commit.message.split\\('\\\\n'\\)[0]\\)\\);}\\);\")",
+      "Bash(npm audit *)",
+      "Bash(npm view *)",
+      "Bash(node -e \"let d='';process.stdin.on\\('data',c=>d+=c\\).on\\('end',\\(\\)=>{const v=JSON.parse\\(d\\);console.log\\(' latest 3.x:', v.filter\\(x=>x.startsWith\\('3.'\\)\\).pop\\(\\)\\);console.log\\(' latest 4.x:', v.filter\\(x=>x.startsWith\\('4.'\\)\\).pop\\(\\)\\);}\\);\")",
+      "Bash(node -e \"const b=require\\('./node_modules/@typescript-eslint/typescript-estree/node_modules/brace-expansion'\\); console.log\\(' v5 module type:', typeof b, '| .expand:', typeof b.expand\\)\")",
+      "Bash(read d *)",
+      "Bash(node -p 'require\\('\\\\''./__TRACKED_VAR__/package.json'\\\\''\\).version')",
+      "Bash(node -e \"const p=require\\('path'\\); const d='node_modules/brace-expansion'; const m=require\\(p.resolve\\(d\\)\\); console.log\\('  typeof:', typeof m\\)\")",
+      "Bash(npm ls *)",
+      "Bash(node -p \"const p=require\\('./node_modules/eslint-config-next/package.json'\\); JSON.stringify\\({main:p.main, exports:p.exports}, null, 1\\)\")",
+      "Bash(pkill -f \"next dev\")",
+      "Bash(npx --yes lighthouse@12 http://localhost:3100/ --only-categories=performance,accessibility,best-practices,seo --form-factor=mobile --screenEmulation.mobile --throttling-method=simulate --quiet --chrome-flags=\"--headless=new --no-sandbox\" --output=json --output-path=/tmp/lh-sec.json)"
     ]
   }
 }

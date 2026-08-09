@@ -1,6 +1,6 @@
 import fs from "node:fs";
 import path from "node:path";
-import matter from "gray-matter";
+import yaml from "js-yaml";
 
 export type PostFrontmatter = {
   title: string;
@@ -28,10 +28,30 @@ function readingMinutes(body: string): number {
   return Math.max(1, Math.round(words / 225));
 }
 
+/**
+ * Splits a leading `---` YAML frontmatter block from the body.
+ *
+ * This used to be gray-matter, which is unmaintained and hard-codes
+ * `yaml.safeLoad` — an API js-yaml removed in v4 — so it can never take the
+ * patched parser (js-yaml 3.15.1 is the last 3.x and carries CVE-2026-53550).
+ * Calling js-yaml 4 directly is a dozen lines and drops both dependencies.
+ */
+function splitFrontmatter(raw: string): { data: Record<string, unknown>; content: string } {
+  const match = /^﻿?---\r?\n([\s\S]*?)\r?\n---[ \t]*(?:\r?\n|$)/.exec(raw);
+  if (!match) return { data: {}, content: raw };
+
+  const parsed = yaml.load(match[1], { filename: "frontmatter" });
+
+  return {
+    data: parsed && typeof parsed === "object" ? (parsed as Record<string, unknown>) : {},
+    content: raw.slice(match[0].length),
+  };
+}
+
 function parseFile(fileName: string): Post {
   const slug = fileName.replace(/\.mdx$/, "");
   const raw = fs.readFileSync(path.join(CONTENT_DIR, fileName), "utf8");
-  const { data, content } = matter(raw);
+  const { data, content } = splitFrontmatter(raw);
 
   const frontmatter = data as Partial<PostFrontmatter>;
 

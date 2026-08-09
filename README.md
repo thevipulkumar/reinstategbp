@@ -160,6 +160,26 @@ invalid fields are marked with an icon, bold ink text, `aria-invalid` and `role=
 solution", and FAQ #8 states plainly that reinstatement cannot be guaranteed. These two agree
 on purpose — please keep them that way.
 
+**Two dependency overrides, and one thing left unfixed.** `npm audit` reports zero
+vulnerabilities, but getting there needed some care:
+
+- **`postcss` and `sharp`** are pinned to patched versions in `overrides`. Both are nested
+  dependencies of `next@15.5.23` — which is the newest 15.x release — and the advisories are
+  only resolved in `next@16`, a breaking upgrade. Both bumps are minor and Next tolerates them
+  (`@tailwindcss/postcss` already ran postcss 8.5.x alongside). **Re-check these when you move
+  to Next 16 and delete them if they become redundant.**
+- **`gray-matter` was removed.** It is unmaintained and hard-codes `yaml.safeLoad`, an API
+  js-yaml dropped in v4, so it can only ever run js-yaml 3.15.1 — the last 3.x, carrying
+  CVE-2026-53550. Frontmatter is now split by `splitFrontmatter()` in `src/lib/blog.ts`, twelve
+  lines calling js-yaml 4 directly. Post format is unchanged; nothing in `src/content/blog/`
+  needed editing.
+- **`brace-expansion@1.1.18` is still in the tree and cannot be removed.** It arrives via
+  `minimatch@3`, which ESLint core itself depends on along with four `eslint-config-next`
+  plugins. v1 exports a function and v5 exports an object, so an override breaks `minimatch@3`
+  and with it linting. It is a devDependency that never reaches the browser or the server
+  bundle. `npm audit` does not flag it; an external scanner did. Revisit when ESLint and the
+  Next plugin set move off `minimatch@3`.
+
 ---
 
 ## How a few things work
