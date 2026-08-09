@@ -34,8 +34,14 @@ export const contactSchema = z.object({
     .min(10, "Tell us a little more — at least a sentence")
     .max(4000, "Please keep this under 4000 characters"),
 
-  /** Honeypot. Real users never see this field, so anything in it is a bot. */
-  website: z.string().max(0).optional().or(z.literal("")),
+  /**
+   * Honeypot. Real users never see this field, so anything in it is a bot.
+   *
+   * Deliberately permissive: if the schema rejected a filled honeypot, the bot
+   * would get a 400 naming the field that caught it. Instead the value is
+   * accepted here and the API route silently returns success without sending.
+   */
+  website: z.string().max(200).optional(),
 
   /** Client timestamp (ms) of when the form was rendered. */
   renderedAt: z.coerce.number().optional(),

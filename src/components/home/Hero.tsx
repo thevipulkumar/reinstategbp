@@ -20,6 +20,7 @@ export function Hero() {
         fill
         priority
         fetchPriority="high"
+        quality={68}
         sizes="100vw"
         className="-z-10 object-cover object-[70%_center]"
       />
@@ -57,7 +58,7 @@ export function Hero() {
           <div className="mt-10 flex flex-col gap-5 sm:flex-row sm:items-center sm:gap-8">
             <a
               href={hero.ctaHref}
-              className="btn-label inline-flex items-center justify-center gap-2.5 rounded-button bg-brand px-7 py-4 text-white transition-[background-color,transform] duration-200 hover:-translate-y-0.5 hover:bg-brand-hover"
+              className="btn-label inline-flex items-center justify-center gap-2.5 rounded-button bg-brand-dark px-7 py-4 text-white transition-[background-color,transform] duration-200 hover:-translate-y-0.5 hover:bg-brand"
             >
               {hero.ctaLabel}
               <ArrowRight aria-hidden="true" className="size-4" />

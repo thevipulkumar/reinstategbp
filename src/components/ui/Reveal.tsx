@@ -1,12 +1,16 @@
-"use client";
-
-import { useEffect, useRef, useState, type ElementType, type ReactNode } from "react";
+import type { ElementType, ReactNode } from "react";
 import { cn } from "@/lib/utils";
 
 /**
- * Fade-and-rise on scroll — 400ms, 12px travel (§3.3). The transition itself
- * lives in globals.css under `.js .reveal`, so content is fully visible when
- * JavaScript is unavailable and when the user prefers reduced motion.
+ * Fade-and-rise on scroll — 400ms, 12px travel (§3.3).
+ *
+ * This is a *server* component: it only stamps a class name. A single
+ * `<RevealObserver />` in the root layout watches every `.reveal` on the page
+ * with one shared IntersectionObserver, which keeps ~30 reveals per page from
+ * becoming ~30 client component instances and ~30 observers.
+ *
+ * The transition itself lives in globals.css under `.js .reveal`, so content is
+ * fully visible without JavaScript and under prefers-reduced-motion.
  */
 export function Reveal({
   as: Tag = "div",
@@ -20,37 +24,9 @@ export function Reveal({
   className?: string;
   children: ReactNode;
 }) {
-  const ref = useRef<HTMLElement>(null);
-  const [revealed, setRevealed] = useState(false);
-
-  useEffect(() => {
-    const node = ref.current;
-    if (!node || revealed) return;
-
-    if (typeof IntersectionObserver === "undefined") {
-      setRevealed(true);
-      return;
-    }
-
-    const observer = new IntersectionObserver(
-      (entries) => {
-        if (entries.some((entry) => entry.isIntersecting)) {
-          setRevealed(true);
-          observer.disconnect();
-        }
-      },
-      { rootMargin: "0px 0px -8% 0px", threshold: 0.05 },
-    );
-
-    observer.observe(node);
-    return () => observer.disconnect();
-  }, [revealed]);
-
   return (
     <Tag
-      ref={ref}
       className={cn("reveal", className)}
-      data-revealed={revealed ? "true" : "false"}
       style={delay ? { transitionDelay: `${delay}ms` } : undefined}
     >
       {children}

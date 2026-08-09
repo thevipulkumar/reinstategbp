@@ -11,7 +11,7 @@ export function FaqAccordion({ items }: { items: FaqItem[] }) {
     <div className="space-y-4">
       {items.map((item) => (
         <details key={item.question} className="faq-item group">
-          <summary className="flex items-start gap-4 rounded-button bg-brand px-5 py-4 text-white transition-colors hover:bg-brand-hover">
+          <summary className="flex items-start gap-4 rounded-button bg-brand-dark px-5 py-4 text-white transition-colors hover:bg-brand">
             <span
               aria-hidden="true"
               className="mt-0.5 flex size-6 shrink-0 items-center justify-center"

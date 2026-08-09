@@ -1,6 +1,5 @@
 import Link from "next/link";
 import { cn } from "@/lib/utils";
-import { site } from "@/data/site";
 
 /**
  * The brand lockup: red map pin + "REINSTATE" in letterspaced caps with
@@ -69,7 +68,9 @@ export function Logo({
   if (href === null) return lockup;
 
   return (
-    <Link href={href} aria-label={`${site.name} — home`} className="inline-flex">
+    // No aria-label: the wordmark inside already names the link, and an
+    // aria-label that doesn't contain the visible text breaks voice control.
+    <Link href={href} className="inline-flex">
       {lockup}
     </Link>
   );

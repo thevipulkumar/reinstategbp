@@ -5,6 +5,7 @@ import { Header } from "@/components/layout/Header";
 import { Footer } from "@/components/layout/Footer";
 import { MobileCtaBar } from "@/components/layout/MobileCtaBar";
 import { JsonLd } from "@/components/ui/JsonLd";
+import { RevealObserver } from "@/components/ui/RevealObserver";
 import { localBusinessSchema, organizationSchema, websiteSchema } from "@/lib/structured-data";
 import { ogImage, site } from "@/data/site";
 import "./globals.css";
@@ -48,10 +49,8 @@ export const metadata: Metadata = {
     follow: true,
     googleBot: { index: true, follow: true, "max-image-preview": "large", "max-snippet": -1 },
   },
-  icons: {
-    icon: [{ url: "/logo/reinstate-gbp-logo.png", type: "image/png" }],
-    apple: [{ url: "/logo/reinstate-gbp-logo.png" }],
-  },
+  // Icons come from the app/ file conventions: favicon.ico, icon.svg,
+  // apple-icon.png. Declaring them here as well would duplicate the link tags.
   formatDetection: { telephone: true, email: true, address: false },
 };
 
@@ -83,7 +82,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       <body className="pb-[72px] md:pb-0">
         <a
           href="#main"
-          className="btn-label sr-only rounded-button focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-[60] focus:bg-brand focus:px-5 focus:py-3 focus:text-white"
+          className="btn-label sr-only rounded-button focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-[60] focus:bg-brand-dark focus:px-5 focus:py-3 focus:text-white"
         >
           Skip to content
         </a>
@@ -92,6 +91,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <main id="main">{children}</main>
         <Footer />
         <MobileCtaBar />
+        <RevealObserver />
 
         <JsonLd data={[organizationSchema(), websiteSchema(), localBusinessSchema()]} />
       </body>

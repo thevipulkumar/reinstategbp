@@ -71,7 +71,7 @@ export function BlogIndex({ page }: { page: number }) {
                 className={cn(
                   "inline-flex size-11 items-center justify-center rounded-button text-[15px] font-semibold transition-colors",
                   number === page
-                    ? "bg-brand text-white"
+                    ? "bg-brand-dark text-white"
                     : "border-2 border-brand-light text-brand-dark hover:bg-mint",
                 )}
               >

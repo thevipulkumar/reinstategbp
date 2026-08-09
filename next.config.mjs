@@ -12,7 +12,14 @@ const nextConfig = {
     ],
   },
   async redirects() {
-    return [{ source: "/services", destination: "/#services", permanent: false }];
+    // There is no /services index page; send stray hits to the main service.
+    return [
+      {
+        source: "/services",
+        destination: "/services/gbp-suspension-reinstatement",
+        permanent: false,
+      },
+    ];
   },
 };
 

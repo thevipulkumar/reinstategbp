@@ -111,7 +111,7 @@ export function ContactForm() {
         <p className="mt-3 text-body">{contactSection.successBody}</p>
         <a
           href={site.phoneHref}
-          className="btn-label mt-7 inline-flex items-center gap-2.5 rounded-button bg-brand px-7 py-4 text-white transition-colors hover:bg-brand-hover"
+          className="btn-label mt-7 inline-flex items-center gap-2.5 rounded-button bg-brand-dark px-7 py-4 text-white transition-colors hover:bg-brand"
         >
           <Phone aria-hidden="true" className="size-4" />
           {site.phoneDisplay}
@@ -234,7 +234,7 @@ export function ContactForm() {
       <button
         type="submit"
         disabled={submitting}
-        className="btn-label flex w-full items-center justify-center gap-2.5 rounded-button bg-brand px-7 py-4 text-white transition-colors hover:bg-brand-hover disabled:cursor-not-allowed disabled:opacity-70"
+        className="btn-label flex w-full items-center justify-center gap-2.5 rounded-button bg-brand-dark px-7 py-4 text-white transition-colors hover:bg-brand disabled:cursor-not-allowed disabled:opacity-70"
       >
         {submitting ? (
           <>

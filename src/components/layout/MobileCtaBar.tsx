@@ -20,7 +20,7 @@ export function MobileCtaBar() {
         </a>
         <Link
           href="/#contact"
-          className="btn-label flex items-center justify-center gap-2 rounded-button bg-brand py-3.5 text-white"
+          className="btn-label flex items-center justify-center gap-2 rounded-button bg-brand-dark py-3.5 text-white"
         >
           Get Started
           <ArrowRight aria-hidden="true" className="size-4" />

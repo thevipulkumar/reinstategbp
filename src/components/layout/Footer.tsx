@@ -92,7 +92,7 @@ export function Footer() {
           </ul>
         </div>
 
-        <p className="mt-6 text-[13px] leading-relaxed text-white/45">
+        <p className="mt-6 text-[13px] leading-relaxed text-white/65">
           {site.name} is an independent service and is not affiliated with, endorsed by, or acting
           as an agent of Google LLC. Google, Google Business Profile and Google Maps are trademarks
           of Google LLC.

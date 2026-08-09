@@ -51,9 +51,10 @@ export default async function ServicePage({ params }: { params: Promise<{ slug: 
 
   if (!service) notFound();
 
+  // No /services index page exists, so the trail goes straight from Home to the
+  // service — an intermediate crumb pointing at this same URL would be a lie.
   const crumbs = [
     { name: "Home", href: "/" },
-    { name: "Services", href: `/services/${service.slug}` },
     { name: service.navLabel, href: `/services/${service.slug}` },
   ];
 

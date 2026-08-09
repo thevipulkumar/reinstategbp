@@ -8,8 +8,14 @@
   --color-brand: #049564;
   --color-brand-hover: #23a277;
   --color-brand-light: #a7dac8;
-  /* Accessible variant of --color-brand for small text on white (7.0:1).
-     Required by §8 — --color-brand itself is only 3.9:1 on white. */
+  /* The accessible green, introduced by §8 of the brief.
+     --color-brand is 3.83:1 against white in BOTH directions, so it is limited
+     to large text (>=24px), icons and other non-text graphics, where 3:1 is the
+     bar. --color-brand-dark is 5.81:1 and carries anything smaller — body-size
+     green text, and any surface with white text on it (buttons, FAQ bars).
+     Note this corrects §8: white on --color-brand does not pass AA for the
+     14px/800 button label, so button fills use --color-brand-dark and lift to
+     --color-brand on hover. */
   --color-brand-dark: #03744e;
   --color-mint: #def7ea;
   --color-mint-pale: #eff6f5;
@@ -40,7 +46,9 @@
   --text-hero--line-height: 1.08;
   --text-h2: clamp(1.75rem, 4vw, 48px);
   --text-h2--line-height: 1.15;
-  --text-h3: clamp(1.25rem, 2vw, 24px);
+  /* Fixed at 24px rather than fluid: H3s are green, and 24px is the threshold
+     at which --color-brand qualifies as large text under WCAG. */
+  --text-h3: 24px;
   --text-h3--line-height: 1.3;
   --text-team: 22px;
   --text-eyebrow: 13px;

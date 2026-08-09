@@ -23,7 +23,25 @@
       "Bash(perl -pi -e 's/      <VideoTestimonials \\\\/>\\\\n//' src/app/services/\\\\[slug\\\\]/page.tsx)",
       "Bash(perl -pi -e 's/import \\\\{ getAllPosts, getTotalPages \\\\} from \"\\\\@\\\\/lib\\\\/blog\";/import { getAllPosts } from \"\\\\@\\\\/lib\\\\/blog\";/' src/app/sitemap.ts)",
       "Bash(npx next *)",
-      "Bash(npx eslint *)"
+      "Bash(npx eslint *)",
+      "Bash(git commit -q --amend -m ' *)",
+      "Bash(node -e \"require.resolve\\('sharp'\\); console.log\\('sharp available'\\)\")",
+      "Bash(node -e ' *)",
+      "Bash(perl -pi -e 's/bg-brand px-7 py-4 text-white/bg-brand-dark px-7 py-4 text-white/g; s/bg-brand px-5 py-4 text-white/bg-brand-dark px-5 py-4 text-white/g; s/bg-brand py-3\\\\.5 text-white/bg-brand-dark py-3.5 text-white/g; s/hover:bg-brand-hover/hover:bg-brand/g; s/\"bg-brand text-white\"/\"bg-brand-dark text-white\"/g; s/focus:bg-brand /focus:bg-brand-dark /g' src/app/layout.tsx src/components/PageHero.tsx src/components/FaqAccordion.tsx src/components/ui/Button.tsx src/components/home/Hero.tsx src/components/contact/ContactForm.tsx src/components/home/ProblemSection.tsx src/components/home/MethodPanel.tsx src/components/blog/BlogIndex.tsx src/components/layout/MobileCtaBar.tsx)",
+      "Bash(perl -pi -e 's/primary: \"bg-brand text-white hover:bg-brand\"/primary: \"bg-brand-dark text-white hover:bg-brand\"/' src/components/ui/Button.tsx)",
+      "Bash(perl -pi -e 's/text-white\\\\/45/text-white\\\\/65/' src/components/layout/Footer.tsx)",
+      "Read(//private/tmp/**)",
+      "Bash(npx --yes lighthouse@12 http://localhost:3100/ --only-categories=performance,accessibility,best-practices,seo --form-factor=mobile --screenEmulation.mobile --throttling-method=simulate --quiet --chrome-flags=\"--headless=new --no-sandbox\" --output=json --output-path=/tmp/lh-home.json)",
+      "Bash(perl -pi -e 's{import \\\\{ JsonLd \\\\} from \"\\\\@/components/ui/JsonLd\";}{import { JsonLd } from \"\\\\@/components/ui/JsonLd\";\\\\nimport { RevealObserver } from \"\\\\@/components/ui/RevealObserver\";}; s{        <MobileCtaBar />}{        <MobileCtaBar />\\\\n        <RevealObserver />}' src/app/layout.tsx)",
+      "Bash(perl -pi -e 's{^import \\\\{ site \\\\} from \"\\\\@/data/site\";\\\\n$}{}' src/components/Logo.tsx)",
+      "Bash(pkill -f \"next start\")",
+      "Bash(rm -rf .next)",
+      "Bash(curl -s -X POST http://localhost:3100/api/contact -H 'Content-Type: application/json' -d '{\"firstName\":\"\",\"lastName\":\"X\",\"email\":\"nope\",\"phone\":\"1\",\"message\":\"short\"}')",
+      "Bash(curl -s -X POST http://localhost:3100/api/contact -H 'Content-Type: application/json' -d '{\"firstName\":\"Bot\",\"lastName\":\"Net\",\"email\":\"bot@example.com\",\"phone\":\"+15551234567\",\"message\":\"buy my seo services right now please\",\"website\":\"http://spam.example\"}')",
+      "Bash(node -e 'console.log\\(Date.now\\(\\)\\)')",
+      "Bash(curl -s -X POST http://localhost:3100/api/contact -H 'Content-Type: application/json' -d \"{\\\\\"firstName\\\\\":\\\\\"Fast\\\\\",\\\\\"lastName\\\\\":\\\\\"Bot\\\\\",\\\\\"email\\\\\":\\\\\"f@example.com\\\\\",\\\\\"phone\\\\\":\\\\\"+15551234567\\\\\",\\\\\"message\\\\\":\\\\\"this was filled in instantly\\\\\",\\\\\"renderedAt\\\\\":$\\(node -e 'console.log\\(Date.now\\(\\)\\)'\\)}\")",
+      "Bash(curl -s -X POST http://localhost:3100/api/contact -H 'Content-Type: application/json' -d '{\"firstName\":\"Dana\",\"lastName\":\"Reyes\",\"email\":\"dana@example.com\",\"phone\":\"+1 555 123 4567\",\"message\":\"My listing was suspended on Tuesday after I changed my address.\"}')",
+      "Bash(curl -s http://localhost:3100/services/appeal-denied)"
     ]
   }
 }

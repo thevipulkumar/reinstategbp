@@ -34,7 +34,7 @@ export function PageHero({
           <nav aria-label="Breadcrumb" className="mb-8">
             <ol className="flex flex-wrap items-center gap-1.5 text-[13px] text-white/60">
               {crumbs.map((crumb, index) => (
-                <li key={crumb.href} className="flex items-center gap-1.5">
+                <li key={`${index}-${crumb.href}`} className="flex items-center gap-1.5">
                   {index > 0 ? (
                     <ChevronRight aria-hidden="true" className="size-3.5 text-white/40" />
                   ) : null}
@@ -73,7 +73,7 @@ export function PageHero({
           <div className="mt-9 flex flex-col gap-4 sm:flex-row sm:items-center sm:gap-6">
             <Link
               href="#contact"
-              className="btn-label inline-flex items-center justify-center gap-2.5 rounded-button bg-brand px-7 py-4 text-white transition-[background-color,transform] duration-200 hover:-translate-y-0.5 hover:bg-brand-hover"
+              className="btn-label inline-flex items-center justify-center gap-2.5 rounded-button bg-brand-dark px-7 py-4 text-white transition-[background-color,transform] duration-200 hover:-translate-y-0.5 hover:bg-brand"
             >
               {ctaLabel}
               <ArrowRight aria-hidden="true" className="size-4" />

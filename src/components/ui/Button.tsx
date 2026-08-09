@@ -11,7 +11,7 @@ const base =
   "hover:-translate-y-0.5 active:translate-y-0 select-none";
 
 const variants: Record<Variant, string> = {
-  primary: "bg-brand text-white hover:bg-brand-hover",
+  primary: "bg-brand-dark text-white hover:bg-brand",
   onDark: "bg-white text-brand-dark border-2 border-brand-light hover:bg-mint",
   ghost:
     "bg-transparent text-white border-2 border-white/70 hover:border-white hover:bg-white/10",

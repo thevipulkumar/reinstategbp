@@ -15,7 +15,7 @@ export function ProblemSection() {
 
           <a
             href={problem.ctaHref}
-            className="btn-label mt-9 inline-flex items-center gap-2.5 rounded-button bg-brand px-7 py-4 text-white transition-[background-color,transform] duration-200 hover:-translate-y-0.5 hover:bg-brand-hover"
+            className="btn-label mt-9 inline-flex items-center gap-2.5 rounded-button bg-brand-dark px-7 py-4 text-white transition-[background-color,transform] duration-200 hover:-translate-y-0.5 hover:bg-brand"
           >
             {problem.ctaLabel}
             <ArrowRight aria-hidden="true" className="size-4" />

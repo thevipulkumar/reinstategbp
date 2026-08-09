@@ -23,7 +23,10 @@ export function TrustStrip() {
                   alt={logo.name}
                   width={logo.width}
                   height={logo.height}
-                  sizes="(min-width: 1024px) 140px, (min-width: 640px) 20vw, 40vw"
+                  // The rendered box is ~123px wide (42px tall, 380:130 source).
+                  // Asking for viewport-relative widths here fetches 3x the
+                  // pixels needed, right behind the LCP image in the queue.
+                  sizes="130px"
                   className="h-[42px] w-auto max-w-full object-contain opacity-70 grayscale transition duration-300 hover:opacity-100 hover:grayscale-0"
                 />
               </li>
