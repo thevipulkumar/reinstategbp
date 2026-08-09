@@ -1,7 +1,6 @@
 import Image from "next/image";
 import { ArrowRight, Phone } from "lucide-react";
 import { Container } from "@/components/ui/Container";
-import { Logo } from "@/components/Logo";
 import { SplitHeadline } from "@/components/SplitHeadline";
 import { hero } from "@/data/home";
 import { site } from "@/data/site";
@@ -41,14 +40,14 @@ export function Hero() {
 
       <Container className="relative pb-32 pt-[132px] md:pb-44 md:pt-[188px]">
         <div className="max-w-[640px] text-white">
-          <Logo href={null} className="text-white" />
-
+          {/* No logo lockup here — the sticky header already carries it, and
+              repeating it above the headline pushed the H1 down the fold. */}
           <SplitHeadline
             lead={hero.headline.lead}
             accent={hero.headline.accent}
             tail={hero.headline.tail}
             accentClassName="text-brand"
-            className="mt-8 text-hero text-white"
+            className="text-hero text-white"
           />
 
           <p className="mt-6 max-w-[560px] text-[17px] leading-relaxed text-white/90">
