@@ -1,0 +1,23 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(npm -v)",
+      "Bash(sips -g hasAlpha -g format Logo/Reinstate-Google-Business-Profile.png)",
+      "Bash(git init *)",
+      "Bash(git config *)",
+      "Bash(npm install *)",
+      "Bash(mkdir -p public/images public/logo/clients src/app src/components src/data src/lib src/content/blog)",
+      "Bash(git mv *)",
+      "Bash(mv Images/Home-Page-Hero.webp public/images/hero-business-owner.webp)",
+      "Bash(mv Images/Resinstate-GBP-Suspend.webp public/images/google-listing-suspended.webp)",
+      "Bash(mv Images/Resinstate-GBP-Consultate.webp public/images/reinstatement-consultation.webp)",
+      "Bash(perl -pi -e 's/\\\\btext-hero !text-white\\\\b/text-hero text-white/' src/components/home/Hero.tsx)",
+      "Bash(perl -pi -e 's/\"eyebrow !text-brand-light\"/\"eyebrow text-brand-light!\"/g' src/components/layout/Footer.tsx)",
+      "Bash(perl -pi -e 's/ring-2 ring-accent-red/ring-2 ring-ink/g; s/text-accent-red/text-ink/g; s/<form onSubmit=\\\\{handleSubmit\\\\\\(onSubmit\\\\\\)\\\\} noValidate className=\"space-y-5\">/<form onSubmit={handleSubmit\\(onSubmit\\)} noValidate className=\"relative space-y-5\">/' src/components/contact/ContactForm.tsx)",
+      "Bash(npx tsc *)",
+      "Bash(npm run *)",
+      "Bash(git add *)",
+      "Bash(git commit -q -m ' *)"
+    ]
+  }
+}

@@ -1,0 +1,264 @@
+@import "tailwindcss";
+
+/* -----------------------------------------------------------------------------
+   Design tokens — §3.1 of the brief. Every value here was sampled from the live
+   site. Nothing outside this block may introduce a new hex value.
+----------------------------------------------------------------------------- */
+@theme {
+  --color-brand: #049564;
+  --color-brand-hover: #23a277;
+  --color-brand-light: #a7dac8;
+  /* Accessible variant of --color-brand for small text on white (7.0:1).
+     Required by §8 — --color-brand itself is only 3.9:1 on white. */
+  --color-brand-dark: #03744e;
+  --color-mint: #def7ea;
+  --color-mint-pale: #eff6f5;
+  --color-mint-field: #edfaf4;
+  --color-surface: #fafbfc;
+  --color-white: #ffffff;
+  --color-ink: #000000;
+  --color-navy: #192a3d;
+  --color-body: #292929;
+  --color-muted: #6f6e6e;
+  --color-accent-red: #ef4134;
+
+  --font-sans: var(--font-space-grotesk), -apple-system, BlinkMacSystemFont,
+    "Segoe UI", Roboto, Helvetica, Arial, sans-serif, "Apple Color Emoji",
+    "Segoe UI Emoji", "Segoe UI Symbol";
+
+  --radius-image: 12px;
+  --radius-button: 8px;
+  --radius-card: 16px;
+  --radius-strip: 24px;
+
+  --spacing-section: 96px;
+  --spacing-section-mobile: 64px;
+  --spacing-container: 1140px;
+  --spacing-gutter: 24px;
+
+  --text-hero: clamp(2.25rem, 6vw, 70px);
+  --text-hero--line-height: 1.08;
+  --text-h2: clamp(1.75rem, 4vw, 48px);
+  --text-h2--line-height: 1.15;
+  --text-h3: clamp(1.25rem, 2vw, 24px);
+  --text-h3--line-height: 1.3;
+  --text-team: 22px;
+  --text-eyebrow: 13px;
+
+  --ease-rise: cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* -----------------------------------------------------------------------------
+   Base
+----------------------------------------------------------------------------- */
+@layer base {
+  html {
+    scroll-behavior: smooth;
+    /* Sticky header clearance for in-page anchors. */
+    scroll-padding-top: 96px;
+    -webkit-text-size-adjust: 100%;
+  }
+
+  body {
+    font-family: var(--font-sans);
+    font-size: 16px;
+    line-height: 1.6;
+    color: var(--color-ink);
+    background-color: var(--color-white);
+    -webkit-font-smoothing: antialiased;
+  }
+
+  h1,
+  h2,
+  h3,
+  h4 {
+    color: var(--color-ink);
+    font-weight: 600;
+    text-wrap: balance;
+  }
+
+  /* Visible focus in brand green — §8. */
+  :focus-visible {
+    outline: 3px solid var(--color-brand);
+    outline-offset: 3px;
+    border-radius: 2px;
+  }
+
+  ::selection {
+    background-color: var(--color-brand);
+    color: var(--color-white);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    html {
+      scroll-behavior: auto;
+    }
+
+    *,
+    *::before,
+    *::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+      scroll-behavior: auto !important;
+    }
+  }
+}
+
+/* -----------------------------------------------------------------------------
+   Utilities
+----------------------------------------------------------------------------- */
+@utility container-page {
+  width: 100%;
+  max-width: calc(var(--spacing-container) + (var(--spacing-gutter) * 2));
+  margin-inline: auto;
+  padding-inline: var(--spacing-gutter);
+}
+
+@utility section-y {
+  padding-block: var(--spacing-section-mobile);
+  @media (width >= 48rem) {
+    padding-block: var(--spacing-section);
+  }
+}
+
+@utility eyebrow {
+  font-size: var(--text-eyebrow);
+  font-weight: 600;
+  line-height: 1.4;
+  text-transform: uppercase;
+  letter-spacing: 0.2em;
+  color: var(--color-brand-dark);
+}
+
+@utility btn-label {
+  font-size: 14px;
+  font-weight: 800;
+  line-height: 1;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+/* -----------------------------------------------------------------------------
+   Scroll reveal — fade and rise, 400ms, 12px travel (§3.3).
+   Elements start hidden only when JS is available, so a no-JS visitor sees
+   fully rendered content.
+----------------------------------------------------------------------------- */
+.js .reveal {
+  opacity: 0;
+  transform: translateY(12px);
+  transition:
+    opacity 400ms var(--ease-rise),
+    transform 400ms var(--ease-rise);
+}
+
+.js .reveal[data-revealed="true"] {
+  opacity: 1;
+  transform: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .js .reveal {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+/* -----------------------------------------------------------------------------
+   FAQ accordion — built on <details>/<summary> so it works with JS disabled.
+----------------------------------------------------------------------------- */
+.faq-item > summary {
+  list-style: none;
+  cursor: pointer;
+}
+
+.faq-item > summary::-webkit-details-marker {
+  display: none;
+}
+
+.faq-item[open] > summary .faq-icon-plus {
+  display: none;
+}
+
+.faq-item:not([open]) > summary .faq-icon-minus {
+  display: none;
+}
+
+/* -----------------------------------------------------------------------------
+   Long-form prose (blog posts, legal pages)
+----------------------------------------------------------------------------- */
+.prose-body {
+  color: var(--color-body);
+  font-size: 17px;
+  line-height: 1.75;
+}
+
+.prose-body > * + * {
+  margin-top: 1.25em;
+}
+
+.prose-body h2 {
+  font-size: clamp(1.5rem, 3vw, 32px);
+  line-height: 1.25;
+  margin-top: 2em;
+}
+
+.prose-body h3 {
+  font-size: 24px;
+  line-height: 1.3;
+  color: var(--color-brand);
+  margin-top: 1.75em;
+}
+
+.prose-body a {
+  color: var(--color-brand-dark);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.prose-body a:hover {
+  color: var(--color-brand-hover);
+}
+
+.prose-body ul,
+.prose-body ol {
+  padding-left: 1.4em;
+}
+
+.prose-body ul {
+  list-style: disc;
+}
+
+.prose-body ol {
+  list-style: decimal;
+}
+
+.prose-body li + li {
+  margin-top: 0.5em;
+}
+
+.prose-body li::marker {
+  color: var(--color-brand);
+}
+
+.prose-body strong {
+  font-weight: 700;
+  color: var(--color-ink);
+}
+
+.prose-body blockquote {
+  border-left: 4px solid var(--color-brand-light);
+  padding-left: 1.25em;
+  font-style: italic;
+}
+
+.prose-body code {
+  background-color: var(--color-mint-field);
+  border-radius: 4px;
+  padding: 0.15em 0.4em;
+  font-size: 0.9em;
+}
+
+.prose-body img {
+  border-radius: var(--radius-image);
+}
