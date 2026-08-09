@@ -48,8 +48,8 @@ export const problem = {
   image: {
     src: "/images/google-listing-suspended.webp",
     alt: "A smiling shop owner holding a phone showing their live Google Business Profile",
-    width: 976,
-    height: 781,
+    width: 1200,
+    height: 960,
   },
 } as const;
 
@@ -82,8 +82,8 @@ export const process = {
   image: {
     src: "/images/reinstatement-consultation.webp",
     alt: "Two shop owners reviewing their reinstatement case on a tablet",
-    width: 800,
-    height: 450,
+    width: 1200,
+    height: 675,
   },
   steps: [
     {

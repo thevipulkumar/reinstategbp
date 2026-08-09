@@ -28,6 +28,10 @@ export function ProblemSection() {
             alt={problem.image.alt}
             width={problem.image.width}
             height={problem.image.height}
+            // The source is upscaled from a small original, so it is already
+            // near its detail ceiling — a second lossy pass at the default q=75
+            // was visibly softening it. q=90 costs ~20KB and removes that.
+            quality={90}
             sizes="(min-width: 1024px) 540px, 100vw"
             className="h-auto w-full rounded-image object-cover"
           />

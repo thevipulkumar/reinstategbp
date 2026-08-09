@@ -18,6 +18,7 @@ export function ProcessSection() {
             alt={process.image.alt}
             width={process.image.width}
             height={process.image.height}
+            quality={90}
             sizes="(min-width: 1024px) 540px, 100vw"
             className="h-auto w-full rounded-image object-cover"
           />
