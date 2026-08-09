@@ -23,7 +23,8 @@ export function ContactSection({ heading = contactSection.heading }: { heading?:
               <span className="flex size-12 shrink-0 items-center justify-center rounded-full bg-mint-field text-brand transition-colors group-hover:bg-brand group-hover:text-white">
                 <Phone aria-hidden="true" className="size-5" />
               </span>
-              <span className="text-[clamp(1.5rem,3.5vw,32px)] font-semibold leading-none tracking-tight text-muted transition-colors group-hover:text-brand-dark">
+              {/* Matched to the email below so the two read as one pair. */}
+              <span className="text-[17px] font-medium text-body transition-colors group-hover:text-brand-dark">
                 {site.phoneDisplay}
               </span>
             </a>

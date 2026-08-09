@@ -140,11 +140,11 @@ and `currentColor` for the wordmark, so it works on any background at any size.
 
 ## Decisions worth knowing about
 
-**Two contact addresses in the brief.** The spec listed `hello@reinstategbp.com` as a conversion
-action and `reinstategbp@gmail.com` in the contact section's verbatim copy. The site shows one
-address everywhere, taken from `site.email` in `src/data/site.ts`, currently set to the verbatim
-value. Change that one constant to switch the whole site. The inbox that *receives* form
-submissions is separate and set by `CONTACT_EMAIL`.
+**One contact address, one constant.** The brief listed two (`hello@reinstategbp.com` and
+`reinstategbp@gmail.com`); `hello@reinstategbp.com` was chosen and is used everywhere — footer,
+contact section, legal pages and the Organization structured data — from `site.email` in
+`src/data/site.ts`. Change that one constant to switch the whole site. The inbox that
+*receives* form submissions is separate and set by `CONTACT_EMAIL`.
 
 **Green that carries white text is `--color-brand-dark`.** The brief states white on
 `#049564` passes AA. It doesn't — that pair is 3.83:1, which only clears the bar for large text,

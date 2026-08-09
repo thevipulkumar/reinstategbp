@@ -11,14 +11,13 @@ export const site = {
     "We get suspended Google Business Profiles reinstated. Suspensions, failed verifications, denied appeals and new listings — handled by specialists with 6+ years of GBP experience.",
 
   /**
-   * NOTE ON THE CONTACT ADDRESS
-   * The brief lists two: `hello@reinstategbp.com` (§1, conversion actions) and
-   * `reinstategbp@gmail.com` (§6.9, verbatim on-page copy). The verbatim copy
-   * rule wins for anything visible, so that address is used site-wide — change
-   * this one constant to switch every mailto: and every rendered address.
+   * The single public-facing address. Used by every rendered address and every
+   * mailto: on the site — footer, contact section, legal pages and the
+   * Organization structured data. Change it here and it changes everywhere.
+   *
    * The inbox that *receives* form submissions is separate: CONTACT_EMAIL.
    */
-  email: "reinstategbp@gmail.com",
+  email: "hello@reinstategbp.com",
 
   /** Displayed exactly as written in the brief; `phoneHref` is the dialable form. */
   phoneDisplay: "+1669-202-2367",
