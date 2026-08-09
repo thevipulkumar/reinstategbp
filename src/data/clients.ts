@@ -7,7 +7,7 @@ export type ClientLogo = {
 
 /** §6.2 trust strip. Rendered greyscale at 70% opacity, full colour on hover. */
 export const clientLogos: ClientLogo[] = [
-  { name: "PD Handy", src: "/logo/clients/pd-handy.svg", width: 380, height: 130 },
+  { name: "PD Handy", src: "/logo/clients/pd-handy.webp", width: 380, height: 130 },
   { name: "Loyalty", src: "/logo/clients/loyalty.webp", width: 380, height: 130 },
   { name: "TV Workshop", src: "/logo/clients/tv-workshop.webp", width: 380, height: 130 },
   { name: "inspraGO", src: "/logo/clients/insprago.webp", width: 380, height: 130 },

@@ -110,21 +110,17 @@ Pagination kicks in at 7 posts (`POSTS_PER_PAGE` in `src/lib/blog.ts`).
 
 ## Outstanding items
 
-### Missing assets
+### Assets
 
-These were not in the source asset folder. Neutral placeholders with the correct dimensions are
-in place — drop the real files in at the same paths and nothing else needs to change.
+All client logos and team headshots are now the real files. Team photos live at
+`public/images/team/{name}.webp`, normalised to 300 × 300 and displayed as 140px rounded
+squares. To swap someone's photo, replace the file at the same path — keep it square so the
+`object-cover` crop stays predictable, and re-crop first if the source is portrait.
 
-| Placeholder                       | Needs                                          |
-| --------------------------------- | ---------------------------------------------- |
-| `public/logo/clients/pd-handy.svg` | The real PD Handy logo (380 × 130, WebP)       |
-| `public/images/team/tim.svg`       | Tim's headshot (150 × 150)                     |
-| `public/images/team/dilip.svg`     | Dilip's headshot (150 × 150)                   |
-| `public/images/team/sophie.svg`    | Sophie's headshot (150 × 150)                  |
-| `public/images/team/prakash.svg`   | Prakash's headshot (150 × 150)                 |
-
-When you swap a headshot in, update its path in `src/data/team.ts` and drop the
-`isPlaceholder: true` flag (it only affects the alt text).
+Two of the four headshots (Sophie, Prakash) are greyscale cut-outs on saturated blue and teal
+backdrops, while Tim and Dilip are full-colour photographs. They read as two different sets in
+the 4-up row. Supplying replacements on a consistent background — or on `--color-mint`
+(`#DEF7EA`) — would tidy that up; nothing in the code needs to change either way.
 
 The brand lockup in the header, hero and footer is drawn as live text plus an inline SVG pin
 rather than an image. The only logo file supplied was a 500 × 500 raster on a solid green plate,
@@ -133,9 +129,6 @@ and `currentColor` for the wordmark, so it works on any background at any size.
 
 ### Copy still to come
 
-- **FAQ answers** — `src/data/faqs.ts` has all eight questions with `TODO` answer placeholders.
-  Replace the strings and the accordion picks them up; no component changes needed. Question 8
-  (the guarantee question) already has a real, deliberately honest answer — see below.
 - **Testimonial attribution** — `src/data/testimonials.ts` has `TODO` values for `clientName`
   and `businessType`. The card UI hides the caption entirely until real values are filled in,
   so nothing reads as broken in the meantime.

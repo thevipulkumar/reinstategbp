@@ -18,13 +18,9 @@ export function TeamSection() {
           <Reveal as="li" key={member.name} delay={index * 70} className="text-center">
             <Image
               src={member.image}
-              alt={
-                member.isPlaceholder
-                  ? `Placeholder portrait for ${member.name}`
-                  : `${member.name}, ${member.role} at Reinstate GBP`
-              }
-              width={150}
-              height={150}
+              alt={`${member.name}, ${member.role} at Reinstate GBP`}
+              width={300}
+              height={300}
               sizes="140px"
               className="mx-auto size-[140px] rounded-image object-cover"
             />

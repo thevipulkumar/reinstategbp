@@ -46,7 +46,11 @@
       "Bash(perl -pi -e 's{import \\\\{ getService, services \\\\} from \"\\\\@/data/services\";}{import { getService, services } from \"\\\\@/data/services\";\\\\nimport { sharedHeadings } from \"\\\\@/data/pages\";}; s{<VideoTestimonials heading=\"Hear from the Business Owners\" withSchema=\\\\{false\\\\} />}{<VideoTestimonials heading={sharedHeadings.testimonials} withSchema={false} />}; s{heading=\\\\{`\\\\$\\\\{service\\\\.navLabel\\\\} — questions we get asked`\\\\}}{heading={sharedHeadings.serviceFaq\\(service.navLabel\\)}}; s{<ContactSection heading=\"Speak to our Experts\" />}{<ContactSection heading={sharedHeadings.contact} />}' src/app/services/\\\\[slug\\\\]/page.tsx)",
       "Bash(perl -pi -e 's{import \\\\{ about \\\\} from \"\\\\@/data/about\";}{import { about } from \"\\\\@/data/about\";\\\\nimport { sharedHeadings } from \"\\\\@/data/pages\";}; s{<ContactSection heading=\"Speak to our Experts\" />}{<ContactSection heading={sharedHeadings.contact} />}' src/app/about/page.tsx)",
       "Bash(perl -0777 -pi -e ' *)",
-      "Bash(perl -pi -e 's{import \\\\{ blogPage, sharedHeadings \\\\} from \"\\\\@/data/pages\";}{import { blogPage } from \"\\\\@/data/pages\";}' \"src/app/blog/[slug]/page.tsx\")"
+      "Bash(perl -pi -e 's{import \\\\{ blogPage, sharedHeadings \\\\} from \"\\\\@/data/pages\";}{import { blogPage } from \"\\\\@/data/pages\";}' \"src/app/blog/[slug]/page.tsx\")",
+      "Bash(grep -rniE '#[0-9a-f]{3,8}\\\\b' src --include=\"*.tsx\" --include=\"*.ts\")",
+      "Bash(grep -nE '#[0-9a-f]{3,8}\\\\b' src/app/globals.css src/app/icon.svg)",
+      "Bash(cd \"/Users/vipulkumar/Documents/Website/Reinstate GBP\" && echo \"--- project root ---\" && ls -la && echo \"--- parent dir ---\" && ls -la .. && echo \"--- untracked files anywhere in project ---\" && git status --short --untracked-files=all | head -20)",
+      "Bash(perl -pi -e 's{^import \\\\{ Logo \\\\} from \"\\\\@/components/Logo\";\\\\n$}{}' src/components/home/Hero.tsx)"
     ]
   }
 }
