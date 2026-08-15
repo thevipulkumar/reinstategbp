@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { Resend } from "resend";
-import { MIN_FILL_MS, contactSchema } from "@/lib/contact-schema";
+import { MIN_FILL_MS, contactSchema, type ContactInput } from "@/lib/contact-schema";
 import { clientIpFrom, rateLimit } from "@/lib/rate-limit";
 import { site } from "@/data/site";
 
@@ -16,6 +16,27 @@ function escapeHtml(value: string) {
     .replace(/</g, "&lt;")
     .replace(/>/g, "&gt;")
     .replace(/"/g, "&quot;");
+}
+
+/**
+ * Last-resort capture. If a lead cannot be emailed we still write the whole
+ * submission to the server log, so it can be recovered by grepping for
+ * CONTACT_LEAD_UNDELIVERED rather than being lost silently. A visitor who
+ * fills this form is the entire point of the site — losing one is worse than
+ * any amount of log noise.
+ */
+function logUndeliveredLead(reason: string, data: ContactInput) {
+  console.error(
+    `[contact] CONTACT_LEAD_UNDELIVERED (${reason}) ` +
+      JSON.stringify({
+        receivedAt: new Date().toISOString(),
+        firstName: data.firstName,
+        lastName: data.lastName,
+        email: data.email,
+        phone: data.phone,
+        message: data.message,
+      }),
+  );
 }
 
 export async function POST(request: Request) {
@@ -72,7 +93,8 @@ export async function POST(request: Request) {
 
   if (!process.env.RESEND_API_KEY) {
     if (process.env.NODE_ENV === "production") {
-      console.error("[contact] RESEND_API_KEY is not set — submission was not delivered.");
+      console.error("[contact] RESEND_API_KEY is not set — cannot send email.");
+      logUndeliveredLead("no-api-key", data);
       return NextResponse.json(
         { ok: false, error: "We couldn't send your message. Please call us." },
         { status: 500 },
@@ -125,6 +147,7 @@ export async function POST(request: Request) {
 
     if (result.error) {
       console.error("[contact] Resend rejected the notification:", result.error);
+      logUndeliveredLead("resend-rejected", data);
       return NextResponse.json(
         { ok: false, error: "We couldn't send your message. Please call us." },
         { status: 502 },
@@ -132,6 +155,7 @@ export async function POST(request: Request) {
     }
   } catch (error) {
     console.error("[contact] Failed to send notification:", error);
+    logUndeliveredLead("send-threw", data);
     return NextResponse.json(
       { ok: false, error: "We couldn't send your message. Please call us." },
       { status: 502 },

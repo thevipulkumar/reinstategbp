@@ -72,7 +72,9 @@
       "Bash(npm ls *)",
       "Bash(node -p \"const p=require\\('./node_modules/eslint-config-next/package.json'\\); JSON.stringify\\({main:p.main, exports:p.exports}, null, 1\\)\")",
       "Bash(pkill -f \"next dev\")",
-      "Bash(npx --yes lighthouse@12 http://localhost:3100/ --only-categories=performance,accessibility,best-practices,seo --form-factor=mobile --screenEmulation.mobile --throttling-method=simulate --quiet --chrome-flags=\"--headless=new --no-sandbox\" --output=json --output-path=/tmp/lh-sec.json)"
+      "Bash(npx --yes lighthouse@12 http://localhost:3100/ --only-categories=performance,accessibility,best-practices,seo --form-factor=mobile --screenEmulation.mobile --throttling-method=simulate --quiet --chrome-flags=\"--headless=new --no-sandbox\" --output=json --output-path=/tmp/lh-sec.json)",
+      "Bash(curl -s -m 10 -o /tmp/live.html -D /tmp/live.headers https://reinstategbp.com)",
+      "Read(//tmp/**)"
     ]
   }
 }

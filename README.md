@@ -54,8 +54,45 @@ All documented in [`.env.example`](.env.example).
 
 ### Deploying
 
-Push to a Git remote and import the repo on Vercel. Add the environment variables above in the
-Vercel project settings. No build configuration is needed — the defaults are correct.
+The site is currently served from **Hostinger** at https://reinstategbp.com, running as a Node
+application (not a static export — `/api/contact` needs a live server).
+
+**Set the environment variables in the host's control panel, not in a file.** `.env.local` is
+gitignored and never leaves your machine, so a key added there has no effect on production. On
+Hostinger this is under the Node.js application's Environment Variables section; on Vercel it is
+Project → Settings → Environment Variables.
+
+**Restart / redeploy after changing them.** The values are read at process start, so an already
+running app will keep using the old ones.
+
+To confirm the contact form can actually send after a deploy, post a submission and read the
+status code — it tells you exactly what is wrong:
+
+```bash
+curl -s -o /dev/null -w "%{http_code}\n" -X POST https://reinstategbp.com/api/contact \
+  -H 'Content-Type: application/json' \
+  -d '{"firstName":"Test","lastName":"Check","email":"you@example.com","phone":"+15550000000","message":"Deployment smoke test, please ignore."}'
+```
+
+| Status | Meaning |
+| ------ | -------------------------------------------------------------------- |
+| `200`  | Sent. Check the inbox. |
+| `500`  | `RESEND_API_KEY` is missing from the environment. |
+| `502`  | Resend rejected it — bad key, or a `RESEND_FROM_EMAIL` domain that isn't verified. |
+| `400`  | Validation rejected the payload (expected for a deliberately bad one). |
+| `429`  | Rate limited — 5 per IP per hour. Wait, or test from another network. |
+
+### If a lead can't be emailed
+
+Any submission that cannot be delivered is still written to the server log in full, tagged
+`CONTACT_LEAD_UNDELIVERED`. Nothing is lost silently. To recover them from the host's log
+viewer or over SSH:
+
+```bash
+grep CONTACT_LEAD_UNDELIVERED <logfile>
+```
+
+Each line carries the timestamp, name, email, phone and message as JSON.
 
 ---
 
