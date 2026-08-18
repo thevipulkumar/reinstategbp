@@ -9,6 +9,15 @@ type Json = Record<string, unknown>;
 const ORG_ID = `${site.url}/#organization`;
 const SITE_ID = `${site.url}/#website`;
 
+/** Countries the service is offered in. Keep Service and LocalBusiness in step. */
+const AREA_SERVED = [
+  { "@type": "Country", name: "United States" },
+  { "@type": "Country", name: "Australia" },
+  { "@type": "Country", name: "United Kingdom" },
+  { "@type": "Country", name: "Canada" },
+  { "@type": "Country", name: "India" },
+];
+
 export function organizationSchema(): Json {
   return {
     "@context": "https://schema.org",
@@ -24,15 +33,14 @@ export function organizationSchema(): Json {
     email: site.email,
     telephone: site.phoneDisplay,
     sameAs: [site.social.youtube],
-    contactPoint: [
-      {
-        "@type": "ContactPoint",
-        telephone: site.phoneDisplay,
-        email: site.email,
-        contactType: "customer support",
-        availableLanguage: ["English"],
-      },
-    ],
+    contactPoint: site.phones.map((phone) => ({
+      "@type": "ContactPoint",
+      telephone: phone.display,
+      email: site.email,
+      contactType: "customer support",
+      areaServed: phone.region,
+      availableLanguage: ["English"],
+    })),
   };
 }
 
@@ -59,13 +67,7 @@ export function localBusinessSchema(): Json {
     telephone: site.phoneDisplay,
     email: site.email,
     priceRange: "$$",
-    areaServed: [
-      { "@type": "Country", name: "United States" },
-      { "@type": "Country", name: "United Kingdom" },
-      { "@type": "Country", name: "Canada" },
-      { "@type": "Country", name: "Australia" },
-      { "@type": "Country", name: "India" },
-    ],
+    areaServed: AREA_SERVED,
     knowsAbout: [
       "Google Business Profile suspension",
       "Google Business Profile verification",
@@ -86,7 +88,7 @@ export function serviceSchema(service: Service): Json {
     description: service.metaDescription,
     url: `${site.url}/services/${service.slug}`,
     provider: { "@id": ORG_ID },
-    areaServed: { "@type": "Country", name: "United States" },
+    areaServed: AREA_SERVED,
     hasOfferCatalog: {
       "@type": "OfferCatalog",
       name: `${service.navLabel} process`,

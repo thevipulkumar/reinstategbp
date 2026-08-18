@@ -55,15 +55,21 @@ export function Footer() {
           <div className="md:col-span-3">
             <h2 className="eyebrow text-brand-light!">Contact</h2>
             <ul className="mt-5 space-y-3">
-              <li>
-                <a
-                  href={site.phoneHref}
-                  className="flex items-start gap-2.5 text-[15px] text-white/80 transition-colors hover:text-white"
-                >
-                  <Phone aria-hidden="true" className="mt-0.5 size-4 shrink-0 text-brand-light" />
-                  {site.phoneDisplay}
-                </a>
-              </li>
+              {site.phones.map((phone) => (
+                <li key={phone.region}>
+                  <a
+                    href={phone.href}
+                    className="flex items-start gap-2.5 text-[15px] text-white/80 transition-colors hover:text-white"
+                    aria-label={`Call us in ${phone.label} on ${phone.display}`}
+                  >
+                    <Phone aria-hidden="true" className="mt-0.5 size-4 shrink-0 text-brand-light" />
+                    <span>
+                      {phone.display}
+                      <span className="block text-[13px] text-white/55">{phone.label}</span>
+                    </span>
+                  </a>
+                </li>
+              ))}
               <li>
                 <a
                   href={`mailto:${site.email}`}

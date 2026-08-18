@@ -102,7 +102,7 @@ Nothing user-facing is hard-coded in a component. Everything lives here:
 
 | File                          | What's in it                                                        |
 | ----------------------------- | ------------------------------------------------------------------- |
-| `src/data/site.ts`            | Business name, phone, email, site URL, social links                  |
+| `src/data/site.ts`            | Business name, phone numbers, email, site URL, social links           |
 | `src/data/home.ts`            | Every homepage section's copy (hero, problem, method, process, team, contact) |
 | `src/data/services.ts`        | All four service pages — hero, causes, process, outcome, per-page FAQs |
 | `src/data/faqs.ts`            | The eight homepage FAQs                                              |
@@ -112,6 +112,20 @@ Nothing user-facing is hard-coded in a component. Everything lives here:
 | `src/data/about.ts`           | About page copy and stats                                            |
 | `src/data/legal.ts`           | Privacy policy and terms                                             |
 | `src/data/navigation.ts`      | Header and footer navigation (services are derived automatically)    |
+
+### Phone numbers
+
+`site.phones` in `src/data/site.ts` holds every number, in priority order. Add or reorder
+entries there and the whole site follows.
+
+`phones[0]` is the primary. It is what the hero, the mobile sticky bar, inner-page heroes and
+the contact form's error fallback use, because those have room for one number and offering two
+just adds a decision. The **contact section and footer render the full list**, each with its
+country label, and the Organization structured data emits one `ContactPoint` per region.
+
+If you later want an Australian visitor to see the AU number in the hero too, that needs
+request-time geo detection — the pages are statically generated, so it cannot be done from the
+manifest alone. Worth doing only once the AU line is carrying real volume.
 
 ### Design tokens
 
