@@ -93,6 +93,71 @@ Either way the behaviour is identical: a notification to `CONTACT_EMAIL` with `R
 the submitter, plus a confirmation to the submitter. If neither is configured the form returns
 500 and the lead is written to the log — see below.
 
+### Also sending leads to a spreadsheet or CRM
+
+Set `LEAD_WEBHOOK_URL` to any endpoint that accepts a JSON POST and every submission is sent
+there as well as by email. This is deliberately generic — the same variable covers Google
+Sheets, Zapier, Make, n8n, HubSpot and Airtable — so changing destination is an environment
+change, not a deploy.
+
+Email and webhook run **concurrently and independently**. A broken spreadsheet cannot cost you
+an email, a blocked SMTP port cannot cost you a spreadsheet row, and the visitor sees success as
+long as at least one destination accepted the lead. Only if *both* fail does the form return
+502, and the lead is still written to the log. A partial failure is logged as
+`Lead captured by ... but ... failed. Investigate.`
+
+Because of that, **a webhook alone is a complete delivery route** — useful if the host blocks
+outbound SMTP, since it works over HTTPS on 443.
+
+The payload:
+
+```json
+{
+  "receivedAt": "2026-08-19T23:53:18.209Z",
+  "form": "contact",
+  "firstName": "Dana", "lastName": "Reyes", "fullName": "Dana Reyes",
+  "email": "dana@example.com", "phone": "+15551234567",
+  "message": "My listing was suspended..."
+}
+```
+
+#### Google Sheets, via Apps Script
+
+In the target spreadsheet, open **Extensions → Apps Script**, paste this, and deploy it as a
+**Web app** (execute as you, access "Anyone"):
+
+```js
+const SECRET = 'choose-a-long-random-string';
+
+function doPost(e) {
+  if (e.parameter.secret !== SECRET) {
+    return ContentService.createTextOutput('forbidden');
+  }
+
+  const lead = JSON.parse(e.postData.contents);
+  SpreadsheetApp.getActiveSpreadsheet()
+    .getSheetByName('Leads')
+    .appendRow([lead.receivedAt, lead.fullName, lead.email, lead.phone, lead.message]);
+
+  return ContentService
+    .createTextOutput(JSON.stringify({ ok: true }))
+    .setMimeType(ContentService.MimeType.JSON);
+}
+```
+
+Add a sheet named `Leads` with those five column headers, then set:
+
+```
+LEAD_WEBHOOK_URL=https://script.google.com/macros/s/XXXX/exec?secret=choose-a-long-random-string
+```
+
+The secret goes in the query string rather than the header here because **Apps Script cannot
+read request headers**. For destinations that can (Zapier, n8n, your own endpoint), use
+`LEAD_WEBHOOK_SECRET` and read the `X-Webhook-Secret` header instead.
+
+Apps Script answers with a 302 to `script.googleusercontent.com`; the webhook follows redirects,
+which is what actually completes the write.
+
 ### Deploying
 
 The site is currently served from **Hostinger** at https://reinstategbp.com, running as a Node
