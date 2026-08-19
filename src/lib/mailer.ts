@@ -73,6 +73,14 @@ function smtpMailer(): Mailer {
     auth: process.env.SMTP_USER
       ? { user: process.env.SMTP_USER, pass: process.env.SMTP_PASS }
       : undefined,
+    // Fail fast rather than leaving the visitor watching a spinner. Shared
+    // hosts commonly block outbound 465/587, and without these the socket just
+    // hangs — the request would time out somewhere further up with the lead
+    // never reaching logUndeliveredLead. Ten seconds is generous for a TCP
+    // connect to a mail provider; anything slower is a blocked port.
+    connectionTimeout: 10_000,
+    greetingTimeout: 10_000,
+    socketTimeout: 20_000,
   });
 
   return {

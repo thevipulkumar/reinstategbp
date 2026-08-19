@@ -58,10 +58,33 @@ All documented in [`.env.example`](.env.example).
 The form needs **one** of two transports. Set either, not both — `src/lib/mailer.ts` picks
 Resend first and falls back to SMTP.
 
-**Option A — SMTP through an existing mailbox (usually fastest).** The site is hosted somewhere
-that already provides email for the domain, so this needs no third-party account and no DNS
-verification. Set `SMTP_HOST`, `SMTP_PORT`, `SMTP_USER` and `SMTP_PASS` to the mailbox's own
-credentials. Port 465 uses implicit TLS; 587 uses STARTTLS.
+**Option A — SMTP through an existing mailbox (usually fastest).** No third-party account and
+no DNS verification. Set `SMTP_HOST`, `SMTP_PORT`, `SMTP_USER` and `SMTP_PASS`. Port 465 uses
+implicit TLS; 587 uses STARTTLS.
+
+For **Google Workspace** (`hello@reinstategbp.com`):
+
+```
+SMTP_HOST=smtp.gmail.com
+SMTP_PORT=465
+SMTP_USER=hello@reinstategbp.com
+SMTP_PASS=<16-character App Password, not the account password>
+MAIL_FROM="Reinstate GBP <hello@reinstategbp.com>"
+```
+
+Three things to know before you try it:
+
+- **It must be an App Password.** Google no longer accepts the account password over SMTP. Turn
+  on 2-Step Verification for that account, then generate an App Password and use the 16
+  characters with the spaces removed. If your Workspace admin has App Passwords disabled, the
+  admin-configured SMTP relay (`smtp-relay.gmail.com`) is the alternative.
+- **`MAIL_FROM` has to be the authenticated address**, or an alias set up under "Send mail as".
+  Google rewrites or rejects anything else, so a mismatch shows up as mail that silently comes
+  from the wrong sender.
+- **The host has to allow outbound SMTP.** Shared hosting frequently blocks ports 465 and 587.
+  If a live submission returns `502` after about ten seconds, that is what happened — the
+  transport now times out deliberately rather than hanging. Use Option B in that case, since
+  Resend goes over HTTPS on 443 and is never blocked.
 
 **Option B — Resend.** Create an account and an API key, then verify the domain in Resend before
 it will send to arbitrary recipients. Set `RESEND_API_KEY`.
