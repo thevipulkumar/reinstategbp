@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { Resend } from "resend";
+import { getMailer } from "@/lib/mailer";
 import { MIN_FILL_MS, contactSchema, type ContactInput } from "@/lib/contact-schema";
 import { clientIpFrom, rateLimit } from "@/lib/rate-limit";
 import { site } from "@/data/site";
@@ -8,7 +8,6 @@ export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 
 const CONTACT_EMAIL = process.env.CONTACT_EMAIL ?? "hello@reinstategbp.com";
-const FROM_EMAIL = process.env.RESEND_FROM_EMAIL ?? "Reinstate GBP <onboarding@resend.dev>";
 
 function escapeHtml(value: string) {
   return value
@@ -91,25 +90,33 @@ export async function POST(request: Request) {
   // --- Deliver --------------------------------------------------------------
   const fullName = `${data.firstName} ${data.lastName}`;
 
-  if (!process.env.RESEND_API_KEY) {
+  const mailer = getMailer();
+
+  // Nothing configured at all: capture the lead so it is recoverable, and be
+  // honest with the visitor rather than showing a success screen for an
+  // enquiry nobody will ever read.
+  if (!mailer) {
     if (process.env.NODE_ENV === "production") {
-      console.error("[contact] RESEND_API_KEY is not set — cannot send email.");
-      logUndeliveredLead("no-api-key", data);
+      console.error(
+        "[contact] No email transport configured. Set RESEND_API_KEY, or SMTP_HOST with " +
+          "SMTP_USER and SMTP_PASS.",
+      );
+      logUndeliveredLead("no-transport", data);
       return NextResponse.json(
         { ok: false, error: "We couldn't send your message. Please call us." },
         { status: 500 },
       );
     }
 
-    console.warn("[contact] RESEND_API_KEY not set. Submission logged instead of sent:", {
-      ...data,
-      website: undefined,
-      renderedAt: undefined,
+    console.warn("[contact] No email transport configured. Submission logged instead of sent:", {
+      firstName: data.firstName,
+      lastName: data.lastName,
+      email: data.email,
+      phone: data.phone,
+      message: data.message,
     });
     return NextResponse.json({ ok: true });
   }
-
-  const resend = new Resend(process.env.RESEND_API_KEY);
 
   const notification = `
     <h2 style="margin:0 0 16px">New enquiry from the website</h2>
@@ -137,25 +144,15 @@ export async function POST(request: Request) {
   `;
 
   try {
-    const result = await resend.emails.send({
-      from: FROM_EMAIL,
-      to: [CONTACT_EMAIL],
+    await mailer.send({
+      to: CONTACT_EMAIL,
       replyTo: data.email,
       subject: `New GBP enquiry — ${fullName}`,
       html: notification,
     });
-
-    if (result.error) {
-      console.error("[contact] Resend rejected the notification:", result.error);
-      logUndeliveredLead("resend-rejected", data);
-      return NextResponse.json(
-        { ok: false, error: "We couldn't send your message. Please call us." },
-        { status: 502 },
-      );
-    }
   } catch (error) {
-    console.error("[contact] Failed to send notification:", error);
-    logUndeliveredLead("send-threw", data);
+    console.error(`[contact] ${mailer.name} failed to send the notification:`, error);
+    logUndeliveredLead(`${mailer.name}-failed`, data);
     return NextResponse.json(
       { ok: false, error: "We couldn't send your message. Please call us." },
       { status: 502 },
@@ -165,14 +162,13 @@ export async function POST(request: Request) {
   // The lead is safely delivered by this point. A failed autoresponder is worth
   // logging but must not turn a captured lead into an error for the visitor.
   try {
-    await resend.emails.send({
-      from: FROM_EMAIL,
-      to: [data.email],
+    await mailer.send({
+      to: data.email,
       subject: "We've received your enquiry — Reinstate GBP",
       html: autoresponse,
     });
   } catch (error) {
-    console.error("[contact] Autoresponder failed:", error);
+    console.error(`[contact] ${mailer.name} autoresponder failed:`, error);
   }
 
   return NextResponse.json({ ok: true });

@@ -46,11 +46,29 @@ All documented in [`.env.example`](.env.example).
 
 | Variable                | Required        | Purpose                                                             |
 | ----------------------- | --------------- | ------------------------------------------------------------------- |
-| `RESEND_API_KEY`        | for the form    | Sends contact form submissions. Without it, dev logs to the console and production returns an error with the phone number as fallback. |
-| `CONTACT_EMAIL`         | for the form    | Inbox that receives new leads.                                       |
-| `RESEND_FROM_EMAIL`     | recommended     | Verified Resend sender. Falls back to Resend's shared sender.        |
+| `CONTACT_EMAIL`         | for the form    | Inbox that receives new leads. `Reply-To` is the submitter.          |
+| `MAIL_FROM`             | recommended     | Sender address on outgoing mail. Defaults to `SMTP_USER` for SMTP.   |
+| `SMTP_HOST` / `SMTP_PORT` / `SMTP_USER` / `SMTP_PASS` | option A | Send through a mailbox you already own. |
+| `RESEND_API_KEY`        | option B        | Send via Resend instead. Takes precedence if both are configured.    |
 | `NEXT_PUBLIC_GTM_ID`    | no              | Google Tag Manager container. Omit to disable GTM (useful locally).  |
 | `NEXT_PUBLIC_SITE_URL`  | for production  | Absolute origin, no trailing slash. Drives canonicals, OG, sitemap and RSS. |
+
+### Making the contact form send
+
+The form needs **one** of two transports. Set either, not both — `src/lib/mailer.ts` picks
+Resend first and falls back to SMTP.
+
+**Option A — SMTP through an existing mailbox (usually fastest).** The site is hosted somewhere
+that already provides email for the domain, so this needs no third-party account and no DNS
+verification. Set `SMTP_HOST`, `SMTP_PORT`, `SMTP_USER` and `SMTP_PASS` to the mailbox's own
+credentials. Port 465 uses implicit TLS; 587 uses STARTTLS.
+
+**Option B — Resend.** Create an account and an API key, then verify the domain in Resend before
+it will send to arbitrary recipients. Set `RESEND_API_KEY`.
+
+Either way the behaviour is identical: a notification to `CONTACT_EMAIL` with `Reply-To` set to
+the submitter, plus a confirmation to the submitter. If neither is configured the form returns
+500 and the lead is written to the log — see below.
 
 ### Deploying
 
@@ -77,8 +95,8 @@ curl -s -o /dev/null -w "%{http_code}\n" -X POST https://reinstategbp.com/api/co
 | Status | Meaning |
 | ------ | -------------------------------------------------------------------- |
 | `200`  | Sent. Check the inbox. |
-| `500`  | `RESEND_API_KEY` is missing from the environment. |
-| `502`  | Resend rejected it — bad key, or a `RESEND_FROM_EMAIL` domain that isn't verified. |
+| `500`  | No transport configured — set SMTP_* or `RESEND_API_KEY`. |
+| `502`  | Transport configured but the send failed — wrong SMTP credentials/port, or an unverified Resend domain. |
 | `400`  | Validation rejected the payload (expected for a deliberately bad one). |
 | `429`  | Rate limited — 5 per IP per hour. Wait, or test from another network. |
 
