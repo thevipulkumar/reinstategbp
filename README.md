@@ -46,7 +46,7 @@ All documented in [`.env.example`](.env.example).
 
 | Variable                | Required        | Purpose                                                             |
 | ----------------------- | --------------- | ------------------------------------------------------------------- |
-| `CONTACT_EMAIL`         | for the form    | Inbox that receives new leads. `Reply-To` is the submitter.          |
+| `CONTACT_EMAIL`         | for the form    | Inbox(es) receiving leads — comma separated for more than one. `Reply-To` is the submitter. |
 | `MAIL_FROM`             | recommended     | Sender address on outgoing mail. Defaults to `SMTP_USER` for SMTP.   |
 | `SMTP_HOST` / `SMTP_PORT` / `SMTP_USER` / `SMTP_PASS` | option A | Send through a mailbox you already own. |
 | `RESEND_API_KEY`        | option B        | Send via Resend instead. Takes precedence if both are configured.    |

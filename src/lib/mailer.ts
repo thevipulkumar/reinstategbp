@@ -29,6 +29,20 @@ export type Mailer = {
   send(message: MailMessage): Promise<void>;
 };
 
+/**
+ * Splits a recipient string into addresses, so CONTACT_EMAIL can name more than
+ * one inbox: "hello@example.com, someone@gmail.com". Without this, SMTP would
+ * happily accept the comma-separated string while Resend would treat the whole
+ * thing as one malformed address — the kind of difference that only shows up
+ * after you switch transports.
+ */
+export function recipients(value: string): string[] {
+  return value
+    .split(",")
+    .map((address) => address.trim())
+    .filter(Boolean);
+}
+
 /** Sender address. SMTP falls back to the mailbox doing the authenticating. */
 function fromAddress(): string {
   return (
@@ -47,7 +61,7 @@ function resendMailer(apiKey: string): Mailer {
     async send(message) {
       const result = await resend.emails.send({
         from: fromAddress(),
-        to: [message.to],
+        to: recipients(message.to),
         replyTo: message.replyTo,
         subject: message.subject,
         html: message.html,
@@ -88,7 +102,7 @@ function smtpMailer(): Mailer {
     async send(message) {
       await transport.sendMail({
         from: fromAddress(),
-        to: message.to,
+        to: recipients(message.to),
         replyTo: message.replyTo,
         subject: message.subject,
         html: message.html,
