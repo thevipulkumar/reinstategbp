@@ -73,10 +73,28 @@ export function getLeadWebhook(): LeadWebhook | null {
           redirect: "follow",
         });
 
+        const text = (await response.text()).slice(0, 500);
+
         if (!response.ok) {
-          throw new Error(
-            `Webhook responded ${response.status}: ${(await response.text()).slice(0, 200)}`,
-          );
+          throw new Error(`Webhook responded ${response.status}: ${text}`);
+        }
+
+        // Google Apps Script answers 200 to everything — a rejected secret, an
+        // uncaught exception, a missing sheet all look identical at the HTTP
+        // layer. So an explicit `{"ok": false}` in the body is treated as a
+        // failure too; without this a wrong secret would silently discard every
+        // lead while the site reported success. Endpoints that return no `ok`
+        // field at all (Zapier, Make) are unaffected.
+        try {
+          const parsed = JSON.parse(text);
+          if (parsed && typeof parsed === "object" && parsed.ok === false) {
+            throw new Error(`Webhook reported failure: ${text}`);
+          }
+        } catch (error) {
+          // Only rethrow our own signal — a non-JSON body is perfectly valid.
+          if (error instanceof Error && error.message.startsWith("Webhook reported failure")) {
+            throw error;
+          }
         }
       } finally {
         clearTimeout(timer);

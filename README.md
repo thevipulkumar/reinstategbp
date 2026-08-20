@@ -123,40 +123,93 @@ The payload:
 
 #### Google Sheets, via Apps Script
 
-In the target spreadsheet, open **Extensions → Apps Script**, paste this, and deploy it as a
-**Web app** (execute as you, access "Anyone"):
+1. Create a spreadsheet. **Extensions → Apps Script.**
+2. Replace everything in `Code.gs` with the script below and set your own `SECRET`.
+3. **Deploy → New deployment → Web app.** Set *Execute as* **Me** and *Who has access*
+   **Anyone**. "Anyone with a Google account" will not work — the POST gets a login redirect
+   instead of reaching the script.
+4. Authorise it. Google shows "hasn't verified this app" for your own scripts: **Advanced →
+   Go to (unsafe)**.
+5. Copy the deployment's **`/exec`** URL (not `/dev`), append `?secret=...`, and set that as
+   `LEAD_WEBHOOK_URL`.
 
 ```js
-const SECRET = 'choose-a-long-random-string';
+const SECRET = 'REPLACE_WITH_A_LONG_RANDOM_STRING';
+const SHEET_NAME = 'Leads';
+const HEADERS = ['Received', 'Name', 'Email', 'Phone', 'Message'];
 
 function doPost(e) {
-  if (e.parameter.secret !== SECRET) {
-    return ContentService.createTextOutput('forbidden');
+  try {
+    if (!e || !e.parameter || e.parameter.secret !== SECRET) {
+      return json({ ok: false, error: 'forbidden' });
+    }
+
+    const lead = JSON.parse(e.postData.contents);
+
+    // Two submissions arriving together must not claim the same row.
+    const lock = LockService.getScriptLock();
+    lock.waitLock(20000);
+    try {
+      const ss = SpreadsheetApp.getActiveSpreadsheet();
+      const sheet = ss.getSheetByName(SHEET_NAME) || ss.insertSheet(SHEET_NAME);
+
+      if (sheet.getLastRow() === 0) {
+        sheet.appendRow(HEADERS);
+        sheet.setFrozenRows(1);
+      }
+
+      sheet.appendRow([
+        lead.receivedAt || new Date().toISOString(),
+        lead.fullName || '',
+        lead.email || '',
+        lead.phone || '',
+        lead.message || '',
+      ]);
+    } finally {
+      lock.releaseLock();
+    }
+
+    return json({ ok: true });
+  } catch (err) {
+    return json({ ok: false, error: String(err) });
   }
+}
 
-  const lead = JSON.parse(e.postData.contents);
-  SpreadsheetApp.getActiveSpreadsheet()
-    .getSheetByName('Leads')
-    .appendRow([lead.receivedAt, lead.fullName, lead.email, lead.phone, lead.message]);
-
+function json(obj) {
   return ContentService
-    .createTextOutput(JSON.stringify({ ok: true }))
+    .createTextOutput(JSON.stringify(obj))
     .setMimeType(ContentService.MimeType.JSON);
 }
 ```
 
-Add a sheet named `Leads` with those five column headers, then set:
+The script creates the `Leads` tab and its header row on the first submission, so there is
+nothing to set up in the sheet by hand.
 
+**Test it on its own before wiring the site to it** — this isolates Apps Script problems from
+site problems:
+
+```bash
+curl -L -X POST "https://script.google.com/macros/s/XXXX/exec?secret=YOUR_SECRET" \
+  -H 'Content-Type: application/json' \
+  -d '{"receivedAt":"2026-01-01T00:00:00Z","fullName":"Test Lead","email":"t@example.com","phone":"+10000000000","message":"Apps Script test"}'
 ```
-LEAD_WEBHOOK_URL=https://script.google.com/macros/s/XXXX/exec?secret=choose-a-long-random-string
-```
 
-The secret goes in the query string rather than the header here because **Apps Script cannot
-read request headers**. For destinations that can (Zapier, n8n, your own endpoint), use
-`LEAD_WEBHOOK_SECRET` and read the `X-Webhook-Secret` header instead.
+`{"ok":true}` and a new row means it is working. `{"ok":false,"error":"forbidden"}` means the
+secret does not match. `-L` matters: Apps Script answers with a 302 to
+`script.googleusercontent.com`, and following it is what completes the write.
 
-Apps Script answers with a 302 to `script.googleusercontent.com`; the webhook follows redirects,
-which is what actually completes the write.
+Two things worth knowing:
+
+- **The secret goes in the query string, not a header.** Apps Script cannot read request
+  headers. `LEAD_WEBHOOK_SECRET` and the `X-Webhook-Secret` header are for destinations that
+  can (Zapier, n8n, your own endpoint).
+- **Apps Script answers 200 to everything** — rejected secret, uncaught exception, missing
+  sheet. The webhook therefore treats an explicit `{"ok": false}` body as a failure as well, so
+  a wrong secret surfaces as a 502 with the lead written to the log, rather than silently
+  discarding every submission while the site reports success.
+
+**Editing the script later:** changes do not go live until you redeploy. **Deploy → Manage
+deployments →** pencil icon **→ Version: New version → Deploy.** The `/exec` URL stays the same.
 
 ### Deploying
 
