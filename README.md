@@ -55,71 +55,49 @@ All documented in [`.env.example`](.env.example).
 
 ### Making the contact form send
 
-The form needs **one** of two transports. Set either, not both — `src/lib/mailer.ts` picks
-Resend first and falls back to SMTP.
+Delivery is a chain, tried in order and stopped at the first success. Both routes reach the
+same inbox, so running them together would send every lead twice.
 
-**Option A — SMTP through an existing mailbox (usually fastest).** No third-party account and
-no DNS verification. Set `SMTP_HOST`, `SMTP_PORT`, `SMTP_USER` and `SMTP_PASS`. Port 465 uses
-implicit TLS; 587 uses STARTTLS.
+1. **Formspree** — primary. Dashboard, spam filtering, submission history.
+2. **Email** — SMTP or Resend, used only if Formspree fails or hits its monthly cap.
+3. **Recovery log** — if everything fails, the lead is written to the server log.
 
-For **Google Workspace** (`hello@reinstategbp.com`):
+The spreadsheet webhook (below) is separate again: it runs *alongside* the chain, because it is
+a different destination rather than an alternative one.
+
+#### Formspree (currently the only configured channel)
 
 ```
-SMTP_HOST=smtp.gmail.com
-SMTP_PORT=465
-SMTP_USER=hello@reinstategbp.com
-SMTP_PASS=<16-character App Password, not the account password>
-MAIL_FROM="Reinstate GBP <hello@reinstategbp.com>"
+FORMSPREE_PROJECT_ID=3073603482452754274
+FORMSPREE_FORM_KEY=contact
 ```
 
-Three things to know before you try it:
+This is a **project-style** form, so the endpoint is `/p/<projectId>/f/<formKey>` and there is
+no hashid — that is why one cannot be found in the dashboard. Dashboard-style forms set
+`FORMSPREE_FORM_ID` instead (a bare hashid or a full URL).
 
-- **It must be an App Password.** Google no longer accepts the account password over SMTP. Turn
-  on 2-Step Verification for that account, then generate an App Password and use the 16
-  characters with the spaces removed. If your Workspace admin has App Passwords disabled, the
-  admin-configured SMTP relay (`smtp-relay.gmail.com`) is the alternative.
-- **`MAIL_FROM` has to be the authenticated address**, or an alias set up under "Send mail as".
-  Google rewrites or rejects anything else, so a mismatch shows up as mail that silently comes
-  from the wrong sender.
-- **The host has to allow outbound SMTP.** Shared hosting frequently blocks ports 465 and 587.
-  If a live submission returns `502` after about ten seconds, that is what happened — the
-  transport now times out deliberately rather than hanging. Use Option B in that case, since
-  Resend goes over HTTPS on 443 and is never blocked.
+Where the lead is emailed is configured in [`formspree.json`](formspree.json), not in the
+environment. To change the recipient, edit that file and redeploy:
 
-**Option B — Resend.** Create an account and an API key, then verify the domain in Resend before
-it will send to arbitrary recipients. Set `RESEND_API_KEY`.
-
-Either way the behaviour is identical: a notification to `CONTACT_EMAIL` with `Reply-To` set to
-the submitter, plus a confirmation to the submitter. If neither is configured the form returns
-500 and the lead is written to the log — see below.
-
-### Also sending leads to a spreadsheet or CRM
-
-Set `LEAD_WEBHOOK_URL` to any endpoint that accepts a JSON POST and every submission is sent
-there as well as by email. This is deliberately generic — the same variable covers Google
-Sheets, Zapier, Make, n8n, HubSpot and Airtable — so changing destination is an environment
-change, not a deploy.
-
-Email and webhook run **concurrently and independently**. A broken spreadsheet cannot cost you
-an email, a blocked SMTP port cannot cost you a spreadsheet row, and the visitor sees success as
-long as at least one destination accepted the lead. Only if *both* fail does the form return
-502, and the lead is still written to the log. A partial failure is logged as
-`Lead captured by ... but ... failed. Investigate.`
-
-Because of that, **a webhook alone is a complete delivery route** — useful if the host blocks
-outbound SMTP, since it works over HTTPS on 443.
-
-The payload:
-
-```json
-{
-  "receivedAt": "2026-08-19T23:53:18.209Z",
-  "form": "contact",
-  "firstName": "Dana", "lastName": "Reyes", "fullName": "Dana Reyes",
-  "email": "dana@example.com", "phone": "+15551234567",
-  "message": "My listing was suspended..."
-}
+```bash
+npx --yes @formspree/cli deploy -k "$FORMSPREE_DEPLOY_KEY"
 ```
+
+The deploy key only authorises overwriting the project's form configuration. **It is not a
+submission credential**: the site never reads it, it must never be committed, and it does not
+belong in the production environment.
+
+**Two current limitations, both worth knowing:**
+
+- **No confirmation email reaches the visitor.** Formspree's `autoresponse` action is a paid
+  feature — the API rejects it with *"Your plan doesn't support autoresponse"* — and the SMTP
+  fallback is currently unconfigured, so nothing sends one. The on-screen confirmation
+  deliberately promises a human reply rather than an email, so the site stays honest. Configure
+  SMTP or upgrade the plan to change this.
+- **Formspree's free plan caps monthly submissions.** With no fallback configured, the
+  submission after the cap is reached fails and the visitor is shown the phone number. The lead
+  is still written to the log, and the cause is logged as `FORMSPREE_QUOTA_REACHED` so it is
+  distinguishable from an ordinary failure at a glance.
 
 #### Google Sheets, via Apps Script
 
