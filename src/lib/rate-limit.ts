@@ -27,7 +27,37 @@ export type RateLimitResult = {
   retryAfter: number;
 };
 
-export function rateLimit(ip: string): RateLimitResult {
+/**
+ * Reports whether `ip` is currently over its limit WITHOUT counting this
+ * request. Call before doing work; call `consumeRateLimit` only once a
+ * submission has actually passed validation.
+ */
+export function checkRateLimit(ip: string): RateLimitResult {
+  const now = Date.now();
+  const existing = windows.get(ip);
+
+  if (!existing || existing.resetAt <= now) {
+    return { ok: true, remaining: MAX_PER_WINDOW, retryAfter: 0 };
+  }
+
+  const retryAfter = Math.ceil((existing.resetAt - now) / 1000);
+
+  if (existing.count >= MAX_PER_WINDOW) {
+    return { ok: false, remaining: 0, retryAfter };
+  }
+
+  return { ok: true, remaining: MAX_PER_WINDOW - existing.count, retryAfter };
+}
+
+/**
+ * Counts one submission against `ip`.
+ *
+ * Deliberately separate from the check: only submissions that passed
+ * validation are counted. Counting rejected ones would lock out someone who
+ * mistypes their phone number a few times — completely normal on a mobile
+ * keyboard — and that person is a real lead, not an attacker.
+ */
+export function consumeRateLimit(ip: string): void {
   const now = Date.now();
 
   // Keep the map from growing without bound on a long-lived instance.
@@ -37,17 +67,10 @@ export function rateLimit(ip: string): RateLimitResult {
 
   if (!existing || existing.resetAt <= now) {
     windows.set(ip, { count: 1, resetAt: now + WINDOW_MS });
-    return { ok: true, remaining: MAX_PER_WINDOW - 1, retryAfter: 0 };
+    return;
   }
 
   existing.count += 1;
-  const retryAfter = Math.ceil((existing.resetAt - now) / 1000);
-
-  if (existing.count > MAX_PER_WINDOW) {
-    return { ok: false, remaining: 0, retryAfter };
-  }
-
-  return { ok: true, remaining: MAX_PER_WINDOW - existing.count, retryAfter };
 }
 
 /** Best-effort client IP from the proxy headers Vercel sets. */

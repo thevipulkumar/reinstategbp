@@ -1,0 +1,13 @@
+{
+  "forms": {
+    "contact": {
+      "name": "Reinstate GBP website enquiry",
+      "actions": [
+        {
+          "type": "email",
+          "to": "hello@reinstategbp.com"
+        }
+      ]
+    }
+  }
+}

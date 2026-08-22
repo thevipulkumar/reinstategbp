@@ -43,6 +43,9 @@ export const contactSchema = z.object({
    */
   website: z.string().max(200).optional(),
 
+  /** Page the form was submitted from, for the recovery log and reporting. */
+  page: z.string().max(200).optional(),
+
   /** Client timestamp (ms) of when the form was rendered. */
   renderedAt: z.coerce.number().optional(),
 });

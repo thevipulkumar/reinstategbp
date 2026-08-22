@@ -1,14 +1,18 @@
 import { NextResponse } from "next/server";
 import { getMailer, type Mailer } from "@/lib/mailer";
+import { FormspreeQuotaError, getFormspree } from "@/lib/formspree";
 import { buildLeadPayload, getLeadWebhook } from "@/lib/lead-webhook";
 import { MIN_FILL_MS, contactSchema, type ContactInput } from "@/lib/contact-schema";
-import { clientIpFrom, rateLimit } from "@/lib/rate-limit";
+import { checkRateLimit, clientIpFrom, consumeRateLimit } from "@/lib/rate-limit";
 import { site } from "@/data/site";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 
-const CONTACT_EMAIL = process.env.CONTACT_EMAIL ?? "hello@reinstategbp.com";
+// LEAD_TO_EMAIL is the documented name; CONTACT_EMAIL is kept so an
+// environment already configured under the old name keeps working.
+const CONTACT_EMAIL =
+  process.env.LEAD_TO_EMAIL ?? process.env.CONTACT_EMAIL ?? "hello@reinstategbp.com";
 
 function escapeHtml(value: string) {
   return value
@@ -29,22 +33,25 @@ type SinkOutcome = { name: string; ok: boolean; error?: unknown };
  */
 function logUndeliveredLead(reason: string, data: ContactInput) {
   console.error(
-    `[contact] CONTACT_LEAD_UNDELIVERED (${reason}) ` +
+    `[contact] LEAD NOT DELIVERED / CONTACT_LEAD_UNDELIVERED (${reason}) ` +
       JSON.stringify({
         receivedAt: new Date().toISOString(),
         firstName: data.firstName,
         lastName: data.lastName,
         email: data.email,
         phone: data.phone,
+        page: data.page ?? "unknown",
         message: data.message,
       }),
   );
 }
 
 export async function POST(request: Request) {
-  // --- Rate limit before doing any work -------------------------------------
+  // --- Rate limit ------------------------------------------------------------
+  // Read-only here. The counter is incremented further down, only once a
+  // submission has passed validation, so typos never lock a real lead out.
   const ip = clientIpFrom(request.headers);
-  const limit = rateLimit(ip);
+  const limit = checkRateLimit(ip);
 
   if (!limit.ok) {
     return NextResponse.json(
@@ -76,6 +83,9 @@ export async function POST(request: Request) {
 
   const data = parsed.data;
 
+  // Valid submission — now it counts against the limit.
+  consumeRateLimit(ip);
+
   // --- Spam gates -----------------------------------------------------------
   // Honeypot: the field is hidden from real users, so anything in it is a bot.
   // Timing: a human cannot complete five fields in under three seconds.
@@ -95,6 +105,7 @@ export async function POST(request: Request) {
 
   const mailer = getMailer();
   const webhook = getLeadWebhook();
+  const formspree = getFormspree();
 
   const notification = `
     <h2 style="margin:0 0 16px">New enquiry from the website</h2>
@@ -121,20 +132,22 @@ export async function POST(request: Request) {
     </div>
   `;
 
-  async function deliverByEmail(transport: Mailer): Promise<SinkOutcome> {
+  async function notifyByEmail(transport: Mailer): Promise<SinkOutcome> {
     try {
       await transport.send({
         to: CONTACT_EMAIL,
         replyTo: data.email,
-        subject: `New GBP enquiry — ${fullName}`,
+        subject: `New enquiry from ${fullName}`,
         html: notification,
       });
+      return { name: transport.name, ok: true };
     } catch (error) {
       return { name: transport.name, ok: false, error };
     }
+  }
 
-    // The lead is safe once the notification is away. A failed autoresponder is
-    // worth logging but must not turn a captured lead into an error.
+  /** Best effort, and deliberately independent of which channel took the lead. */
+  async function sendAutoresponse(transport: Mailer) {
     try {
       await transport.send({
         to: data.email,
@@ -144,17 +157,13 @@ export async function POST(request: Request) {
     } catch (error) {
       console.error(`[contact] ${transport.name} autoresponder failed:`, error);
     }
-
-    return { name: transport.name, ok: true };
   }
 
-  // Nothing configured at all: capture the lead and be honest with the visitor,
-  // rather than showing a success screen for an enquiry nobody will ever read.
-  if (!mailer && !webhook) {
+  if (!mailer && !webhook && !formspree) {
     if (process.env.NODE_ENV === "production") {
       console.error(
-        "[contact] No delivery configured. Set RESEND_API_KEY, or SMTP_HOST with SMTP_USER " +
-          "and SMTP_PASS, or LEAD_WEBHOOK_URL.",
+        "[contact] No delivery configured. Set FORMSPREE_PROJECT_ID + FORMSPREE_FORM_KEY, " +
+          "or SMTP_HOST with SMTP_USER and SMTP_PASS, or LEAD_WEBHOOK_URL.",
       );
       logUndeliveredLead("no-sink", data);
       return NextResponse.json(
@@ -173,42 +182,66 @@ export async function POST(request: Request) {
     return NextResponse.json({ ok: true });
   }
 
-  // Each destination is independent and they run concurrently, so a broken
-  // spreadsheet cannot cost an email and a blocked SMTP port cannot cost a
-  // spreadsheet row. One success is enough for the lead to be safe.
-  const outcomes = (
-    await Promise.all([
-      mailer ? deliverByEmail(mailer) : null,
-      webhook
-        ? webhook
-            .send(buildLeadPayload(data))
-            .then<SinkOutcome>(() => ({ name: webhook.name, ok: true }))
-            .catch<SinkOutcome>((error) => ({ name: webhook.name, ok: false, error }))
-        : null,
-    ])
-  ).filter((outcome): outcome is SinkOutcome => outcome !== null);
+  // The spreadsheet/CRM is a different destination, not an alternative one, so
+  // it runs alongside rather than as part of the fallback chain.
+  const webhookPromise = webhook
+    ? webhook
+        .send(buildLeadPayload(data))
+        .then<SinkOutcome>(() => ({ name: webhook.name, ok: true }))
+        .catch<SinkOutcome>((error) => ({ name: webhook.name, ok: false, error }))
+    : null;
 
-  const failed = outcomes.filter((outcome) => !outcome.ok);
-  const delivered = outcomes.filter((outcome) => outcome.ok);
+  // Notification chain, tried in order and stopped at the first success — both
+  // routes land in the same inbox, so running them together would just send
+  // every lead twice.
+  const notifyOutcomes: SinkOutcome[] = [];
 
-  for (const outcome of failed) {
+  if (formspree) {
+    try {
+      await formspree.send(data);
+      notifyOutcomes.push({ name: formspree.name, ok: true });
+    } catch (error) {
+      if (error instanceof FormspreeQuotaError) {
+        console.error(
+          "[contact] FORMSPREE_QUOTA_REACHED — submissions are being refused until the plan " +
+            "resets or is upgraded. Falling back to email.",
+          error.message,
+        );
+      }
+      notifyOutcomes.push({ name: formspree.name, ok: false, error });
+    }
+  }
+
+  const notified = () => notifyOutcomes.some((outcome) => outcome.ok);
+
+  if (!notified() && mailer) {
+    notifyOutcomes.push(await notifyByEmail(mailer));
+  }
+
+  if (mailer) await sendAutoresponse(mailer);
+
+  const webhookOutcome = webhookPromise ? await webhookPromise : null;
+  const outcomes = [...notifyOutcomes, ...(webhookOutcome ? [webhookOutcome] : [])];
+
+  for (const outcome of outcomes.filter((o) => !o.ok)) {
     console.error(`[contact] ${outcome.name} delivery failed:`, outcome.error);
   }
 
+  const delivered = outcomes.filter((outcome) => outcome.ok);
+
   if (delivered.length === 0) {
-    logUndeliveredLead(failed.map((outcome) => outcome.name).join("+"), data);
+    logUndeliveredLead(outcomes.map((outcome) => outcome.name).join("+") || "no-sink", data);
     return NextResponse.json(
       { ok: false, error: "We couldn't send your message. Please call us." },
       { status: 502 },
     );
   }
 
-  if (failed.length > 0) {
-    // Partial delivery. The visitor is fine — the lead reached somewhere — but
-    // this needs to be loud, because it is the state that quietly rots.
+  const failedNames = outcomes.filter((o) => !o.ok).map((o) => o.name);
+  if (failedNames.length > 0) {
     console.warn(
-      `[contact] Lead captured by ${delivered.map((o) => o.name).join(", ")} but ` +
-        `${failed.map((o) => o.name).join(", ")} failed. Investigate.`,
+      `[contact] lead captured by ${delivered.map((o) => o.name).join(", ")}; ` +
+        `${failedNames.join(", ")} failed`,
     );
   }
 
