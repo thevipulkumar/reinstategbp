@@ -10,7 +10,12 @@ import remarkGfm from "remark-gfm";
  * loudly during a production build when one is missing.
  */
 if (process.env.NODE_ENV === "production") {
-  const requiredPublic = ["NEXT_PUBLIC_SITE_URL", "NEXT_PUBLIC_GTM_ID"];
+  // Analytics is satisfied by either id, so it is checked as a pair rather
+  // than requiring both.
+  const requiredPublic = ["NEXT_PUBLIC_SITE_URL"];
+  if (!process.env.NEXT_PUBLIC_GTM_ID && !process.env.NEXT_PUBLIC_GA_ID) {
+    requiredPublic.push("NEXT_PUBLIC_GA_ID or NEXT_PUBLIC_GTM_ID");
+  }
   const missing = requiredPublic.filter((name) => !process.env[name]);
 
   if (missing.length > 0) {

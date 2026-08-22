@@ -1,6 +1,6 @@
 import type { Metadata, Viewport } from "next";
 import { Space_Grotesk } from "next/font/google";
-import { GoogleTagManager } from "@next/third-parties/google";
+import { GoogleAnalytics, GoogleTagManager } from "@next/third-parties/google";
 import { Header } from "@/components/layout/Header";
 import { Footer } from "@/components/layout/Footer";
 import { MobileCtaBar } from "@/components/layout/MobileCtaBar";
@@ -60,7 +60,12 @@ export const viewport: Viewport = {
   initialScale: 1,
 };
 
+// Two different products, either or both. GTM-XXXXXXX is a Tag Manager
+// container; G-XXXXXXXXXX is a GA4 measurement ID loaded through gtag.js.
+// If GA4 is already configured as a tag inside GTM, set only the GTM id —
+// loading both would count every page view twice.
 const gtmId = process.env.NEXT_PUBLIC_GTM_ID;
+const gaId = process.env.NEXT_PUBLIC_GA_ID;
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
@@ -79,6 +84,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         />
       </head>
       {gtmId ? <GoogleTagManager gtmId={gtmId} /> : null}
+      {gaId ? <GoogleAnalytics gaId={gaId} /> : null}
       <body className="pb-[72px] md:pb-0">
         <a
           href="#main"

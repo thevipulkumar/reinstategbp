@@ -88,12 +88,20 @@ export function ContactForm() {
         return;
       }
 
-      window.dataLayer = window.dataLayer ?? [];
-      window.dataLayer.push({
-        event: "generate_lead",
+      const conversion = {
         form_name: "contact",
         form_location: window.location.pathname,
-      });
+      };
+
+      // Tag Manager listens for an event object on the dataLayer...
+      window.dataLayer = window.dataLayer ?? [];
+      window.dataLayer.push({ event: "generate_lead", ...conversion });
+
+      // ...but GA4 loaded through gtag.js does not interpret that as an event.
+      // It needs gtag('event', ...). Firing both means the conversion is
+      // recorded whichever of the two is configured, and GA4 de-duplicates if
+      // it happens to receive it via GTM as well.
+      window.gtag?.("event", "generate_lead", conversion);
 
       reset();
       setStatus("success");

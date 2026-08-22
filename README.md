@@ -50,7 +50,8 @@ All documented in [`.env.example`](.env.example).
 | `MAIL_FROM`             | recommended     | Sender address on outgoing mail. Defaults to `SMTP_USER` for SMTP.   |
 | `SMTP_HOST` / `SMTP_PORT` / `SMTP_USER` / `SMTP_PASS` | option A | Send through a mailbox you already own. |
 | `RESEND_API_KEY`        | option B        | Send via Resend instead. Takes precedence if both are configured.    |
-| `NEXT_PUBLIC_GTM_ID`    | no              | Google Tag Manager container. Omit to disable GTM (useful locally).  |
+| `NEXT_PUBLIC_GA_ID`     | recommended     | GA4 measurement id (`G-…`), loaded via gtag.js. Build-time inlined.  |
+| `NEXT_PUBLIC_GTM_ID`    | optional        | Tag Manager container (`GTM-…`). Set only one unless GA4 is not inside GTM. |
 | `NEXT_PUBLIC_SITE_URL`  | for production  | Absolute origin, no trailing slash. Drives canonicals, OG, sitemap and RSS. |
 
 ### Making the contact form send
